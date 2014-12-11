@@ -27,6 +27,26 @@
          	</div>
          </div>
      </div>
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+      </div>
+      <div class="modal-body">
+        ...
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
  </center>
   <div id="map-canvas" style="width: 100%; height: 100%"></div>
 </body>
@@ -63,7 +83,7 @@ $(document).ready(function(){
   var lat;
   var longi;
   var map;
-
+  var uname;
   if (navigator.geolocation){
   	geolocate();
     navigator.geolocation.getCurrentPosition(showPosition);
@@ -77,13 +97,19 @@ $(document).ready(function(){
 	      			map: map,
 	      			title: dataArr[i].username
 	      	});
+	    		 google.maps.event.addListener(mark, 'click', function() {
+	    		 	console.log('HELLO');
+    				$('#myModal').modal('show');
+					});
 	    		 allMarkers.push(mark);
-    	}
+    	
+    }
     });
     
   }
   $form.submit(function(event){
   	event.preventDefault();
+  	uname = $username.val();
   	socket.emit("check-in", $username.val(), lat, longi);
   	$form.hide();
   	$registerwell.hide();
@@ -142,13 +168,19 @@ $(document).ready(function(){
           });
                 socket.on("update-map", function(dataArr){
     			for(var i=0; i< dataArr.length; i++){
+    				if(dataArr[i].username == uname){} else {
 	    		var ltlng = new google.maps.LatLng(dataArr[i].lat,dataArr[i].longi);
 	    		var mark = new google.maps.Marker({
 	      				position: ltlng,
 	      				map: map,
 	      				title: dataArr[i].username
 	      	});
+	    		google.maps.event.addListener(mark, 'click', function() {
+	    			console.log('HELLO');
+    				$('#myModal').modal('show');
+    				});
 	    		allMarkers.push(mark);
+	    	}
     	}
     });
 

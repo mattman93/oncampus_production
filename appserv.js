@@ -20,14 +20,14 @@ server.listen(8080);
     }
   });
   }
-  
+
   var users = [];
 
    io.sockets.on('connection', function(socket){
 
    	socket.on("map-loaded", function(lat, longi){
 
-	io.sockets.emit("send-users", users);
+	socket.broadcast.emit("send-users", users);
    	});
 socket.on("check-in", function(username, lat, longi){
 	var user = {
@@ -47,7 +47,7 @@ socket.on("check-in", function(username, lat, longi){
    		var uname = socket.username;
    		console.log(uname);
    		users.splice(socket.username);
-   		io.sockets.emit("remove-marker", uname);
+   		socket.broadcast.emit("remove-marker", uname);
    		console.log("arr len : " + users.length);
    	});
 

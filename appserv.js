@@ -27,7 +27,7 @@ server.listen(8080);
 
    	socket.on("map-loaded", function(lat, longi){
 
-	socket.emit("send-users", users);
+	io.sockets.emit("send-users", users);
    	});
 socket.on("check-in", function(username, lat, longi){
 	var user = {
@@ -35,14 +35,20 @@ socket.on("check-in", function(username, lat, longi){
    		longi: longi,
    		username: username
    	}
-
+   	socket.username = username;
    		users.push(user);
    		//console.log(socket);
    		console.log("array len: " + users.length);
+   		io.sockets.emit("update-map", users);
    	});
 
 
    	socket.on('disconnect', function(){
+   		var uname = socket.username;
+   		console.log(uname);
+   		users.splice(socket.username);
+   		io.sockets.emit("remove-marker", uname);
+   		console.log("arr len : " + users.length);
    	});
 
 

@@ -63,6 +63,7 @@ $(document).ready(function(){
   var lat;
   var longi;
   var map;
+
   if (navigator.geolocation){
   	geolocate();
     navigator.geolocation.getCurrentPosition(showPosition);
@@ -70,18 +71,16 @@ $(document).ready(function(){
     socket.emit("map-loaded", str);
     socket.on("send-users", function(dataArr){
     	for(var i=0; i< dataArr.length; i++){
-    		console.log(dataArr[i].lat);
-    		console.log(dataArr[i].longi);
-    		console.log(dataArr[i].username);
 	    		var ltlng = new google.maps.LatLng(dataArr[i].lat,dataArr[i].longi);
-	    		 new google.maps.Marker({
-	      		position: ltlng,
-	      		map: map,
-	      		title: dataArr[i].username
+	    		 var mark = new google.maps.Marker({
+	      			position: ltlng,
+	      			map: map,
+	      			title: dataArr[i].username
 	      	});
-
+	    		 allMarkers.push(mark);
     	}
     });
+    
   }
   $form.submit(function(event){
   	event.preventDefault();
@@ -130,13 +129,13 @@ $(document).ready(function(){
           }
           socket.on("remove-marker", function(data){
           	console.log(data);
+          	var indx;
          	for(var x=0; x<allMarkers.length; x++){
           		if(allMarkers[x].title == data){
           			indx = x;
           		}
           	} 
           	console.log(indx);
-          	//console.log(allMarkers[0].title);
           	allMarkers[indx].setMap(null);
           	console.log("Marker remove request recieved");
 

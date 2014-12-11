@@ -1,0 +1,132 @@
+ <html>
+ <body>
+ 	 <link rel="stylesheet" href="//code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css">
+      <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+      <!-- Include all compiled plugins (below), or include individual files as needed -->
+      <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+    <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap-theme.min.css">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><center>
+ 	<div id="contactform">
+ 	  <div class="col-sm-4">
+          <div id ="registerwell" class="well well-lg">
+            <center>
+              <form role="form" id="adduser" action ="submitRegistration.php" method="POST">
+              <div class="form-group">
+                <label for="UserNameRegister">Username</label>
+                <input type="text" name = "registerusername" class="form-control" id="UserNameRegister" placeholder="Register Username">
+                 <input type="submit" style="height:35px; width:65px" value="register"></input>
+              </div>
+         	</div>
+         </div>
+     </div>
+ </center>
+  <div id="map-canvas" style="width: 100%; height: 100%"></div>
+</body>
+</html>
+<style type="text/css">
+#map-canvas {
+  height: 100%;
+  width: 100%;
+  position:absolute;
+  top: 0;
+  left: 0;
+  z-index: 0; 
+}
+#contactform {
+  position: relative;
+  z-index: 1; /* The z-index should be higher than Google Maps */
+  opacity: .85; /* Set the opacity for a slightly transparent Google Form */
+  width: 1000;
+  margin-left: 450 ;
+  margin-right: 20 ;
+}
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false&key=AIzaSyAd_qUj056TQ8botUBBwAoRY8Mm5z4O8Lk&libraries=places"></script>
+<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+<script src="http://localhost:8080/socket.io/socket.io.js"></script>
+<script>
+$(document).ready(function(){
+	var $form    = $('#adduser');
+	var $username = $('#UserNameRegister');
+	var $registerwell = $('#registerwell');
+	var socket  = io.connect('http://localhost:8080');
+  var lat;
+  var longi;
+  var map;
+  if (navigator.geolocation){
+  	geolocate();
+    navigator.geolocation.getCurrentPosition(showPosition);
+    var str = "success";
+    socket.emit("map-loaded", str);
+    socket.on("send-users", function(dataArr){
+    	for(var i=0; i< dataArr.length; i++){
+    		console.log(dataArr[i].lat);
+    		console.log(dataArr[i].longi);
+    		console.log(dataArr[i].username);
+	    		var ltlng = new google.maps.LatLng(dataArr[i].lat,dataArr[i].longi);
+	    		new google.maps.Marker({
+	      		position: ltlng,
+	      		map: map,
+	      		title: dataArr[i].username
+	      	});
+    	}
+    });
+  }
+  $form.submit(function(event){
+  	event.preventDefault();
+  	socket.emit("check-in", $username.val(), lat, longi);
+  	$form.hide();
+  	$registerwell.hide();
+  });
+  function showPosition(position){
+       lat = position.coords.latitude.toString().substr(0,6);
+       longi = position.coords.longitude.toString().substr(0,7);
+    
+      //socket.emit()
+      var mapOptions = {
+        center : new google.maps.LatLng(lat,longi),
+        zoom : 15,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+      }
+       map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+      var latlng = new google.maps.LatLng(lat,longi);
+    	//socket.emit("map-loaded", lat, longi);
+    	//socket.on("all-markers", function(data){
+
+    	//})
+     /* 	new google.maps.Marker({
+      		position: latlng,
+      		map: map
+      	});
+ */
+      google.maps.event.addDomListener(window, 'load', showPosition);
+  }
+ // geolocate();
+
+  function geolocate() {
+            var input = document.getElementById('AddressRegister');
+            var optns = {
+                types: ['address']
+            };
+            if (navigator.geolocation) {
+              navigator.geolocation.getCurrentPosition(function(position) {
+                var geolocation = new google.maps.LatLng(
+                    position.coords.latitude, position.coords.longitude);
+                ac = new google.maps.places.Autocomplete(input, optns).setBounds(new google.maps.LatLngBounds(geolocation, geolocation));
+
+              });
+            }
+          }
+
+});
+
+</script>

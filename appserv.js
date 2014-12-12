@@ -51,7 +51,7 @@ socket.on("check-in", function(username, lat, longi){
           			indx = x;
           		}
           	}
-				users.splice(indx, 1);			
+		users.splice(indx, 1);			
    		io.sockets.emit("remove-marker", uname);
    		console.log("arr len : " + users.length);
    	}

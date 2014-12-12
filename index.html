@@ -31,11 +31,12 @@
 
 <div class="panel panel-primary" id="chatwindow">
   <div class="panel-heading"></div>
-  <div class="panel-body">
+  	<div class="panel-body">
+  		<br><div id="chatbox" border="1" style="height:300px;width:1100px;overflow-y:auto;position:relative;bottom:0;"></div><br>
 		    <div class="input-group input-group-lg">
-		  <span class="input-group-addon">@</span>
-		  <input type="text" class="form-control" placeholder="Username">
-</div>
+		 	<span class="input-group-addon">@</span>
+		  	<input type="text" class="form-control" placeholder="Username">
+	</div>
   </div>
 </div>
 
@@ -92,8 +93,9 @@ $(document).ready(function(){
     socket.on("send-users", function(dataArr){
     	for(var i=0; i< dataArr.length; i++){
     		if(dataArr[i].username == uname){
-    			console.log(dataArr[i].username);
+    			console.log("YES");
     		} else {
+    			console.log("NO");
     			console.log(dataArr[i].username);
 	    		var ltlng = new google.maps.LatLng(dataArr[i].lat,dataArr[i].longi);
 	    		 var mark = new google.maps.Marker({
@@ -101,7 +103,7 @@ $(document).ready(function(){
 	      			map: map,
 	      			title: dataArr[i].username
 	      	});
-	    	/*	 google.maps.event.addListener(mark, 'click', function() {
+	    		 /*google.maps.event.addListener(mark, 'click', function() {
 	    		 	console.log('HELLO');
     				$('#chatwindow').show();
 					});
@@ -131,19 +133,9 @@ $(document).ready(function(){
       }
        map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
       var latlng = new google.maps.LatLng(lat,longi);
-    	//socket.emit("map-loaded", lat, longi);
-    	//socket.on("all-markers", function(data){
 
-    	//})
-     /* 	new google.maps.Marker({
-      		position: latlng,
-      		map: map
-      	});
- */
       google.maps.event.addDomListener(window, 'load', showPosition);
   }
- // geolocate();
-
   function geolocate() {
             var input = document.getElementById('AddressRegister');
             var optns = {
@@ -160,19 +152,16 @@ $(document).ready(function(){
           }
           socket.on("remove-marker", function(data){
           	console.log(data);
-          	var indx;
-         	for(var x=0; x<allMarkers.length; x++){
+          	for(var x=0; x<allMarkers.length; x++){
           		if(allMarkers[x].title == data){
-          			indx = x;
+          			allMarkers[x].setMap(null);
+                console.log("Marker remove request recieved");
+               // break;
           		}
-          	} 
-          	console.log(indx);
-          	allMarkers[indx].setMap(null);
-          	console.log("Marker remove request recieved");
-
+          	} 	
           });
                 socket.on("update-map", function(dataArr){
-    			for(var i=0; i< dataArr.length; i++){
+    		  	for(var i=0; i< dataArr.length; i++){
     				if(dataArr[i].username == uname){} else {
 	    			var ltlng = new google.maps.LatLng(dataArr[i].lat,dataArr[i].longi);
 	    			var mark = new google.maps.Marker({
@@ -180,7 +169,7 @@ $(document).ready(function(){
 	      				map: map,
 	      				title: dataArr[i].username
 	      	});
-	    	/*	google.maps.event.addListener(mark, 'click', function() {
+	    		/*google.maps.event.addListener(mark, 'click', function() {
 	    			console.log('HELLO');
     				$('#chatwindow').show();
     				});

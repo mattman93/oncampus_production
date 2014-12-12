@@ -27,7 +27,7 @@ server.listen(8080);
 
    	socket.on("map-loaded", function(lat, longi){
 
-	socket.broadcast.emit("send-users", users);
+	io.sockets.emit("send-users", users);
    	});
 socket.on("check-in", function(username, lat, longi){
 	var user = {
@@ -45,10 +45,16 @@ socket.on("check-in", function(username, lat, longi){
 
    	socket.on('disconnect', function(){
    		var uname = socket.username;
-   		console.log(uname);
-   		users.splice(socket.username);
-   		socket.broadcast.emit("remove-marker", uname);
+   		if(uname == undefined){} else { 
+   		for(var x=0; x<users.length; x++){
+          		if(users[x].username == uname){
+          			indx = x;
+          		}
+          	}
+				users.splice(indx, 1);			
+   		io.sockets.emit("remove-marker", uname);
    		console.log("arr len : " + users.length);
+   	}
    	});
 
 

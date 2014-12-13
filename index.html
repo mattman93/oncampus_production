@@ -14,6 +14,7 @@
 <!-- Latest compiled and minified JavaScript -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
 <br><br><br><br><br><br><br><br><br><br><br><br><br><center>
+<div id="error"><b> Make a user name to send a chat request</b></div>
  	<div id="contactform">
  	  <div class="col-sm-4">
           <div id ="registerwell" class="well well-lg">
@@ -32,7 +33,10 @@
 <div class="panel panel-primary" id="chatwindow">
   <div class="panel-heading"></div>
   	<div class="panel-body">
-  		<br><div id="chatbox" border="1" style="height:300px;width:1100px;overflow-y:auto;position:relative;bottom:0;"></div><br>
+  		<br><center>
+      <input type="submit" class="btn btn-primary" id="bttn" style="margin-left:180; margin-right:300;height:50px;width:300px;" value=""></input>
+      </center>
+      <div id="chatbox" border="1" style="height:100px;width:50px;"></div><br>    
 		    <div class="input-group input-group-lg">
 		 	<span class="input-group-addon">@</span>
 		  	<input type="text" class="form-control" placeholder="Username">
@@ -65,9 +69,15 @@
 #chatwindow {
 	display: none;
 	position: relative;
+    resize: both;
 	margin-left: 300 ;
-  	margin-right: 300 ;
+  margin-right: 300 ;
 	z-index: 2;
+}
+#error {
+  display: none;
+  position: relative;
+  z-index: 1;
 }
 </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
@@ -80,11 +90,14 @@ $(document).ready(function(){
 	var $form    = $('#adduser');
 	var $username = $('#UserNameRegister');
 	var $registerwell = $('#registerwell');
+  var $sendReq = $('#bttn');
 	var socket  = io.connect('http://localhost:8080');
   var lat;
   var longi;
   var map;
   var uname;
+  var identifier;
+  var errFlag = false; 
   if (navigator.geolocation){
   	geolocate();
     navigator.geolocation.getCurrentPosition(showPosition);
@@ -103,11 +116,17 @@ $(document).ready(function(){
 	      			map: map,
 	      			title: dataArr[i].username
 	      	});
-	    		 /*google.maps.event.addListener(mark, 'click', function() {
-	    		 	console.log('HELLO');
-    				$('#chatwindow').show();
+	    		 google.maps.event.addListener(mark, 'click', function() {
+	    		 	 console.log('HELLO');
+            if(uname == undefined){
+              $('#error').show();
+              errFlag = true;
+            } else {
+              $('#chatwindow').show();
+             identifier = mark.title;
+            $('#bttn').attr('value', 'Send chat Request to ' + identifier);
+              }
 					});
- */
 	    		 allMarkers.push(mark);
 	    		}
    		 }
@@ -117,9 +136,17 @@ $(document).ready(function(){
   $form.submit(function(event){
   	event.preventDefault();
   	uname = $username.val();
+    if(errFlag){
+        $('#error').hide();
+    }
   	socket.emit("check-in", $username.val(), lat, longi);
+
   	$form.hide();
   	$registerwell.hide();
+  });
+  $sendReq.click(function(event){
+    event.preventDefault();
+    console.log("derp " + identifier);
   });
   function showPosition(position){
        lat = position.coords.latitude.toString().substr(0,6);
@@ -154,11 +181,16 @@ $(document).ready(function(){
           	console.log(data);
           	for(var x=0; x<allMarkers.length; x++){
           		if(allMarkers[x].title == data){
+                var temp = allMarkers[x].title;
           			allMarkers[x].setMap(null);
-                console.log("Marker remove request recieved");
+                if(identifier == temp){
+                  $('#chatwindow').hide();
+                }
+            
                // break;
           		}
           	} 	
+                console.log("Marker remove request recieved");
           });
                 socket.on("update-map", function(dataArr){
     		  	for(var i=0; i< dataArr.length; i++){
@@ -169,11 +201,17 @@ $(document).ready(function(){
 	      				map: map,
 	      				title: dataArr[i].username
 	      	});
-	    		/*google.maps.event.addListener(mark, 'click', function() {
+	    		google.maps.event.addListener(mark, 'click', function() {
 	    			console.log('HELLO');
-    				$('#chatwindow').show();
+            if(uname == undefined){
+              $('#error').show();
+              errFlag = true;
+            } else {
+              $('#chatwindow').show();
+             identifier = mark.title;
+            $('#bttn').attr('value', 'Send chat Request to ' + identifier);
+              }
     				});
- */
 	    		allMarkers.push(mark);
 	    	}
     	}

@@ -8,3 +8,12 @@ will be able to select who they want to chat with by clicking on their marker, i
 modal chat window
 
 currently just getting the markers to appear and be removed on the map
+
+Notes for Developers
+
+you will need socket.io module installed as a dependency
+start your node server with
+
+-> node appserv.js
+
+

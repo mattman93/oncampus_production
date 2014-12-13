@@ -22,7 +22,7 @@ server.listen(8080);
   }
 
   var users = [];
-
+  
    io.sockets.on('connection', function(socket){
 
    	socket.on("map-loaded", function(lat, longi){
@@ -41,8 +41,6 @@ socket.on("check-in", function(username, lat, longi){
    		console.log("array len: " + users.length);
    		io.sockets.emit("update-map", users);
    	});
-
-
    	socket.on('disconnect', function(){
    		var uname = socket.username;
    		if(uname == undefined){} else { 

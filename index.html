@@ -19,7 +19,7 @@
  	  <div class="col-sm-4">
           <div id ="registerwell" class="well well-lg">
             <center>
-              <form role="form" id="adduser" action ="submitRegistration.php" method="POST">
+              <form role="form" id="adduser" method="POST">
               <div class="form-group">
                 <label for="UserNameRegister">Username</label>
                 <input type="text" name = "registerusername" class="form-control" id="UserNameRegister" placeholder="Register Username">
@@ -34,7 +34,9 @@
   <div class="panel-heading"></div>
   	<div class="panel-body">
   		<br><center>
+      <form id="chatReq">
       <input type="submit" class="btn btn-primary" id="bttn" style="margin-left:180; margin-right:300;height:50px;width:300px;" value=""></input>
+      </form>
       </center>
       <div id="chatbox" border="1" style="height:100px;width:50px;"></div><br>    
 		    <div class="input-group input-group-lg">
@@ -136,6 +138,13 @@ $(document).ready(function(){
     });
     
   }
+  $sendReq.click(function(event){
+    event.preventDefault();
+    socket.emit("chat-request", identifier, uname);
+  });
+  socket.on("show-client-req", function(to, from){
+      console.log("request to chat from " + from);
+  });
   $form.submit(function(event){
   	event.preventDefault();
   	uname = $username.val();
@@ -147,13 +156,11 @@ $(document).ready(function(){
   	$form.hide();
   	$registerwell.hide();
   });
-  $sendReq.click(function(event){
-    event.preventDefault();
-    console.log("derp " + identifier);
-  });
   function showPosition(position){
-       lat = position.coords.latitude.toString().substr(0,6);
-       longi = position.coords.longitude.toString().substr(0,7);
+       lat = position.coords.latitude
+       longi = position.coords.longitude
+       console.log("lat " + lat);
+       console.log("long " + longi);
     
       //socket.emit()
       var mapOptions = {

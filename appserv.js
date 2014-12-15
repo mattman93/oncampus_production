@@ -4,7 +4,7 @@ var fs = require('fs');
 var path = require('path');
 var url = require('url');
 var http = require('http');
-var mysql = require('mysql')
+var mysql = require('mysql');
 
 server.listen(8080);
 
@@ -28,7 +28,7 @@ server.listen(8080);
 
    	  socket.on("map-loaded", function(lat, longi){
 
-    	 io.sockets.emit("send-users", userData);
+    	 socket.emit("send-users", userData);
    	});
 function makeid()
 {
@@ -56,9 +56,8 @@ socket.on("check-in", function(username, lat, longi){
              socket.longi = longi;
              users.push(socket.username);
              userData.push(user);
-         	//	console.log(socket);
                		console.log("array len: " + users.length);
-               		io.sockets.emit("update-map", userData);
+               		socket.broadcast.emit("update-map", userData);
         });
 
 

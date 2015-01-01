@@ -38,7 +38,7 @@ function makeid()
     for( var i=0; i < 14; i++ )
         text += possible.charAt(Math.floor(Math.random() * possible.length));
 
-    return text; 
+    return text;
 }
 socket.on("check-in", function(username, lat, longi){
       	var user = {
@@ -46,7 +46,7 @@ socket.on("check-in", function(username, lat, longi){
          		longi: longi,
          		username: username,
          	}
-          
+
           	var id = makeid();
              socket.user = id
              socket.username = username;
@@ -73,15 +73,15 @@ socket.on("chat-request", function(to, from){
 
 socket.on('disconnect', function(){
      		var uname = socket.username;
-     		if(uname == undefined){} else { 
+     		if(uname == undefined){} else {
          		for(var x=0; x<users.length; x++){
                 		if(users[x]== uname){
                 			indx = x;
                 		}
                 	}
-                  
-        		users.splice(indx, 1);	
-            userData.splice(indx, 1);		
+
+        		users.splice(indx, 1);
+            userData.splice(indx, 1);
          		io.sockets.emit("remove-marker", uname);
          		console.log("arr len : " + users.length);
             console.log("userData len : " + userData.length);

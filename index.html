@@ -1,18 +1,8 @@
  <html>
  <body>
- 	 <link rel="stylesheet" href="//code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css">
-      <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-      <!-- Include all compiled plugins (below), or include individual files as needed -->
-      <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
-    <!-- Latest compiled and minified CSS -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css">
-
-<!-- Optional theme -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap-theme.min.css">
-
-<!-- Latest compiled and minified JavaScript -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+   <link href="css/bootstrap.min.css" rel="stylesheet">
+   <script src="js/bootstrap.min.js"></script>
 <br><br><br><br><br><br><br><br><br><br><br><br><br><center>
 <div id="allRequests"></div>
 <div id="incoming-request">
@@ -45,11 +35,12 @@
   <div class="panel-heading"></div>
   	<div class="panel-body">
   		<br><center>
+      <div id="waiting"><b>Waiting...</b></div>
       <form id="chatReq">
       <input type="submit" class="btn btn-primary" id="bttn" style="margin-left:180; margin-right:300;height:50px;width:300px;" value=""></input>
       </form>
       </center>
-      <div id="chatbox" border="1" style="height:100px;width:50px;"></div><br>    
+      <div id="chatbox" border="1" style="height:100px;width:50px;"></div><br>
 		    <div class="input-group input-group-lg">
 		 	<span class="input-group-addon">@</span>
 		  	<input type="text" class="form-control" placeholder="Username">
@@ -69,18 +60,18 @@
   position:absolute;
   top: 0;
   left: 0;
-  z-index: 0; 
+  z-index: 0;
 }
 #contactform {
   position: relative;
   z-index: 1; /* The z-index should be higher than Google Maps */
   opacity: .85; /* Set the opacity for a slightly transparent Google Form */
   width: 1000;
-  margin-left: 450 ;
+  margin-left: 530 ;
   margin-right: 20 ;
 }
 #incoming-request {
-  display: none; 
+  display: none;
    z-index: 1; /* The z-index should be higher than Google Maps */
    opacity: .85; /* Set the opacity for a slightly transparent Google Form */
    width: 400;
@@ -90,7 +81,7 @@
   margin-right: 30%;
 }
 #allRequests {
-  display: none; 
+  display: none;
    z-index: 1; /* The z-index should be higher than Google Maps */
    opacity: .85; /* Set the opacity for a slightly transparent Google Form */
     position: relative;
@@ -111,11 +102,14 @@
   z-index: 1;
 }
 #recReq {
-  display: none; 
+  display: none;
    position: relative;
    margin-left: -45%;
   margin-right: -45%;
   z-index: 1;
+}
+#waiting {
+  display: none;
 }
 </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
@@ -129,13 +123,14 @@ $(document).ready(function(){
 	var $username = $('#UserNameRegister');
 	var $registerwell = $('#registerwell');
   var $sendReq = $('#bttn');
+  var $wait = $('#waiting');
 	var socket  = io.connect('http://localhost:8080');
   var lat;
   var longi;
   var map;
   var uname;
   var identifier;
-  var errFlag = false; 
+  var errFlag = false;
   if (navigator.geolocation){
   	geolocate();
     navigator.geolocation.getCurrentPosition(showPosition);
@@ -161,6 +156,8 @@ socket.on("send-users", function(dataArr){
   $sendReq.click(function(event){
     event.preventDefault();
     socket.emit("chat-request", identifier, uname);
+    $sendReq.hide();
+    $wait.show();
   });
   socket.on("show-client-req", function(to, from){
     $('#allRequests').show();
@@ -168,8 +165,8 @@ socket.on("send-users", function(dataArr){
     $('#incoming-request').show();
     $('#recReq').show();
     $('#allRequests').append($('#incoming-request'));
-    
-    
+
+
       console.log("request to chat from " + from);
   });
   $form.submit(function(event){
@@ -184,11 +181,11 @@ socket.on("send-users", function(dataArr){
   	$registerwell.hide();
   });
   function showPosition(position){
-       lat = position.coords.latitude
-       longi = position.coords.longitude
+       lat = position.coords.latitude.toString().substr(0,8);
+       longi = position.coords.longitude.toString().substr(0,8);
        console.log("lat " + lat);
        console.log("long " + longi);
-    
+
       //socket.emit()
       var mapOptions = {
         center : new google.maps.LatLng(lat,longi),
@@ -246,10 +243,8 @@ socket.on("send-users", function(dataArr){
                 if(identifier == temp){
                   $('#chatwindow').hide();
                 }
-            
-               // break;
           		}
-          	} 	
+          	}
                 console.log("Marker remove request recieved");
           });
                 socket.on("update-map", function(dataArr){
@@ -258,38 +253,36 @@ socket.on("send-users", function(dataArr){
                        }
                   allMarkers = [];
     		  	for(var i=0; i < dataArr.length; i++){
-              
+
                 if(allMarkers.indexOf(dataArr[i].username) == -1){} else {
                   allMarkers.splice(indexOf(dataArr[i].username), 1);
                 }
-               
+
               if(dataArr.length > 1){
               if(i == dataArr.length-1){
                  if((dataArr[i].lat ||  dataArr[i].longi)==(dataArr[i-1].lat ||  dataArr[i-1].longi)){
-                  dataArr[i].lat = dataArr[i].lat + 0.0000112;
-                  dataArr[i].longi = dataArr[i].longi + 0.0000112;
+                //  dataArr[i].lat = dataArr[i].lat + 0.0000112;
+                //  dataArr[i].longi = dataArr[i].longi + 0.0000112;
                 }
               } else {
                 if((dataArr[i].lat ||  dataArr[i].longi)==(dataArr[i+1].lat ||  dataArr[i+1].longi)){
-                  dataArr[i].lat = dataArr[i].lat + 0.0000112;
-                  dataArr[i].longi = dataArr[i].longi + 0.0000112;
+              //    dataArr[i].lat = dataArr[i].lat + 0.0000112;
+              //    dataArr[i].longi = dataArr[i].longi + 0.0000112;
                 }
           }
         }
-             
     				if(dataArr[i].username == uname){
             } else {
 	    			var ltlng = new google.maps.LatLng(dataArr[i].lat,dataArr[i].longi);
             var marker = createmarker(ltlng, dataArr[i].username);
             allMarkers.push(marker);
-	    
 	    	}
     	 }
        console.log("listing markers array from map update ");
        for(var i=0; i < allMarkers.length; i++){
           console.log("Marker : " + i + " " + allMarkers[i].title);
        }
-      
+
     });
 
 });

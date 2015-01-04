@@ -36,10 +36,12 @@
   	<div class="panel-body">
   		<br><center>
       <div id="waiting"><b>Waiting...</b></div>
-      <form id="chatReq">
+
+    <!--  <form id="chatReq">
       <input type="submit" class="btn btn-primary" id="bttn" style="margin-left:180; margin-right:300;height:50px;width:300px;" value=""></input>
       </form>
-      </center>
+    </center> -->
+
       <div id="chatbox" border="1" style="height:100px;width:50px;"></div><br>
 		    <div class="input-group input-group-lg">
 		 	<span class="input-group-addon">@</span>
@@ -261,13 +263,17 @@ socket.on("send-users", function(dataArr){
               if(dataArr.length > 1){
               if(i == dataArr.length-1){
                  if((dataArr[i].lat ||  dataArr[i].longi)==(dataArr[i-1].lat ||  dataArr[i-1].longi)){
-                //  dataArr[i].lat = dataArr[i].lat + 0.0000112;
-                //  dataArr[i].longi = dataArr[i].longi + 0.0000112;
+                    // This is concatenating 0.0003112 onto end of string - parse to int
+                  dataArr[i].lat = parseFloat(dataArr[i].lat) + 0.0003112;
+                  dataArr[i].longi = parseFloat(dataArr[i].longi) + 0.0003112;
+                  console.log("After location Modification  " + dataArr[i].lat);
                 }
               } else {
                 if((dataArr[i].lat ||  dataArr[i].longi)==(dataArr[i+1].lat ||  dataArr[i+1].longi)){
-              //    dataArr[i].lat = dataArr[i].lat + 0.0000112;
-              //    dataArr[i].longi = dataArr[i].longi + 0.0000112;
+                        // This is concatenating 0.0003112 onto end of string - parse to int
+                  dataArr[i].lat = parseFloat(dataArr[i].lat) + 0.0003112;
+                  dataArr[i].longi = parseFloat(dataArr[i].longi) + 0.0003112;
+                  console.log("After location Modification  " + dataArr[i].lat);
                 }
           }
         }

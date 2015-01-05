@@ -177,11 +177,19 @@ socket.on("send-users", function(dataArr){
     if(errFlag){
         $('#error').hide();
     }
-  	socket.emit("check-in", $username.val(), lat, longi);
-
+    var modifier = randomIntFromInterval(1,5);
+    var modstr = ".00"+modifier;
+    var m = parseFloat(modstr);
+    var mod_lat = parseFloat(lat) + m;
+    var mod_long = parseFloat(longi) + m;
+  	socket.emit("check-in", $username.val(), mod_lat, mod_long);
   	$form.hide();
   	$registerwell.hide();
   });
+  function randomIntFromInterval(min,max)
+{
+      return Math.floor(Math.random()*(max-min+1)+min);
+}
   function showPosition(position){
        lat = position.coords.latitude.toString().substr(0,8);
        longi = position.coords.longitude.toString().substr(0,8);

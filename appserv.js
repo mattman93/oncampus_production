@@ -43,7 +43,8 @@ function makeid()
 }
 function randomize(username){
   //find nearest user
-  var best;
+  var best = Number.MAX_VALUE;
+  var ind_best = 0;
   var self_lat = users[username].lat;
   var self_long = users[username].longi;
   if(available.length > 1){
@@ -51,13 +52,16 @@ function randomize(username){
     console.log("me : " + username + " lat:" + self_lat + " long: " + self_long);
     for(var x=0; x<available.length; x++){
       //sort by distance
-        /*  var distLong = self_long - available[x].longi;
+          var distLong = self_long - available[x].longi;
           var distLat = self_lat - available[x].lat;
-          var res = distLong + distLat;
-          */
-
-      console.log("distance from " + available[x].username + " long:" + available[x].longi + " lat:" + available[x].lat);
+          var res = Math.abs(distLong + distLat);
+         if(res < best && res != 0){
+            best = res;
+            ind_best = x;
+          }
+      console.log("distance from " + available[x].username + " : " + res);
     }
+    console.log("CLOSEST CHAT PARTNER = " + available[ind_best].username);
   }
 }
 socket.on("check-in", function(username, lat, longi){

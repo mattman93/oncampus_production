@@ -8,9 +8,11 @@
 <div id="incoming-request">
   <div id ="requestWell" class="well well-lg">
     <div id="header"></div>
-         <form id="recReq">
-           <input type="submit" class="btn btn-success" id="btn" style="margin-left:180; margin-right:300;height:50px;width:300px;" value="Accept"></input>
-           <input type="submit" class="btn btn-danger" id="btn" style="margin-left:180; margin-right:300;height:50px;width:300px;" value="Decline"></input>
+           <form id="accReq">
+           <input type="submit" class="btn btn-success" id="btn" style="margin-left:5; margin-right:300;height:50px;width:300px;" value="Accept"></input>
+         </form>
+         <form id="decReq">
+           <input type="submit" class="btn btn-danger" id="btn" style="margin-left:5; margin-right:300;height:50px;width:300px;" value="Decline"></input>
          </form>
   </div>
 </div>
@@ -32,22 +34,19 @@
 
 
 <div class="panel panel-primary" id="chatwindow">
-  <div class="panel-heading"></div>
-  	<div class="panel-body">
   		<br><center>
+        <div id="messages"></div>
       <div id="waiting"><b>Waiting...</b></div>
-
-    <!--  <form id="chatReq">
-      <input type="submit" class="btn btn-primary" id="bttn" style="margin-left:180; margin-right:300;height:50px;width:300px;" value=""></input>
+      <form id="chatReq">
+      <input type="submit" class="btn btn-primary" id="bttn" value=""></input>
       </form>
-    </center> -->
-
-      <div id="chatbox" border="1" style="height:100px;width:50px;"></div><br>
+      </center>
 		    <div class="input-group input-group-lg">
-		 	<span class="input-group-addon">@</span>
-		  	<input type="text" class="form-control" placeholder="Username">
-	</div>
-  </div>
+          <form role="form" id="sendmsg" method="POST">
+          <div class="form-group">
+          <input type="text" id="msg" class="form-control" placeholder="Message">&nbsp
+		 	      <input type="submit" style="height:45px;width:70px;" value="send"></input>
+     </form>
 </div>
 
 
@@ -56,6 +55,12 @@
 </body>
 </html>
 <style type="text/css">
+#messages
+{
+   height:80px;
+    overflow:scroll;
+    overflow-x:hidden;
+}
 #map-canvas {
   height: 100%;
   width: 100%;
@@ -76,11 +81,10 @@
   display: none;
    z-index: 1; /* The z-index should be higher than Google Maps */
    opacity: .85; /* Set the opacity for a slightly transparent Google Form */
-   width: 400;
+   width: 350;
   position: relative;
-
-  margin-left: 30%;
-  margin-right: 30%;
+  margin-left: 20%;
+  margin-right: 80%;
 }
 #allRequests {
   display: none;
@@ -96,6 +100,7 @@
     resize: both;
 	margin-left: 300 ;
   margin-right: 300 ;
+  height: 250px;
 	z-index: 2;
 }
 #error {
@@ -113,6 +118,9 @@
 #waiting {
   display: none;
 }
+#frm {
+  display:inline
+  }
 </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false&key=AIzaSyAd_qUj056TQ8botUBBwAoRY8Mm5z4O8Lk&libraries=places"></script>
@@ -120,30 +128,41 @@
 <script src="http://localhost:8080/socket.io/socket.io.js"></script>
 <script>
 $(document).ready(function(){
+//  $('#chatwindow').show();
 	var allMarkers = [];
 	var $form    = $('#adduser');
+  var $accReq = $('#accReq');
+  var $decReq = $('#decReq');
 	var $username = $('#UserNameRegister');
 	var $registerwell = $('#registerwell');
   var $sendReq = $('#bttn');
   var $wait = $('#waiting');
+  var $sendmsg = $('#sendmsg');
+  var $msg = $('#msg');
 	var socket  = io.connect('http://localhost:8080');
+  var data_one;
+  var data_two;
   var lat;
   var longi;
   var map;
   var uname;
   var identifier;
   var errFlag = false;
+  var global_to;
+  var global_from;
   if (navigator.geolocation){
   	geolocate();
     navigator.geolocation.getCurrentPosition(showPosition);
-    var str = "success";
     window.onload = mpld();
     function mpld(){
+      var str =" success ";
     socket.emit("map-loaded", str);
   }
-
+  function updateScroll(){
+      var element = document.getElementById("messages");
+      element.scrollTop = element.scrollHeight;
+  }
 socket.on("send-users", function(dataArr){
-
       for(var i=0; i< dataArr.length; i++){
         if(dataArr[i].username == uname){
         } else {
@@ -162,14 +181,47 @@ socket.on("send-users", function(dataArr){
     $wait.show();
   });
   socket.on("show-client-req", function(to, from){
+    global_to = to;
+    global_from = from;
+
     $('#allRequests').show();
     $('#header').html("<h1>Chat Request From " + from + "</h1>");
     $('#incoming-request').show();
     $('#recReq').show();
     $('#allRequests').append($('#incoming-request'));
-
-
       console.log("request to chat from " + from);
+
+  });
+  $accReq.submit(function(event){
+    event.preventDefault();
+    socket.emit("accept", global_from, global_to);
+  });
+  socket.on("joined", function(data1, data2){
+      data_one = data1;
+      data_two = data2;
+    $('#chatwindow').show();
+    $('#bttn').hide();
+    $sendReq.hide();
+    $wait.hide();
+    $('#allRequests').hide();
+    $('#chatwindow').append(data1 + " is now talking to " + data2);
+  });
+  $decReq.submit(function(event){
+    event.preventDefault();
+    socket.emit("decline", from);
+  });
+  $sendmsg.submit(function(event){
+    event.preventDefault();
+    socket.emit("message", data_one, data_two, $msg.val());
+    $msg.val("");
+  });
+  socket.on("sendmsg", function(data){
+    $('#messages').append("<b>" + data + "</b><br>");
+    updateScroll();
+
+  });
+  socket.on("dec", function(data){
+
   });
   $form.submit(function(event){
   	event.preventDefault();
@@ -177,25 +229,15 @@ socket.on("send-users", function(dataArr){
     if(errFlag){
         $('#error').hide();
     }
-    var modifier = randomIntFromInterval(1,5);
-    var modstr = ".00"+modifier;
-    var m = parseFloat(modstr);
-    var mod_lat = parseFloat(lat) + m;
-    var mod_long = parseFloat(longi) + m;
-  	socket.emit("check-in", $username.val(), mod_lat, mod_long);
+  	socket.emit("check-in", $username.val(), lat, longi);
   	$form.hide();
   	$registerwell.hide();
   });
-  function randomIntFromInterval(min,max)
-{
-      return Math.floor(Math.random()*(max-min+1)+min);
-}
   function showPosition(position){
        lat = position.coords.latitude.toString().substr(0,8);
        longi = position.coords.longitude.toString().substr(0,8);
        console.log("lat " + lat);
        console.log("long " + longi);
-
       //socket.emit()
       var mapOptions = {
         center : new google.maps.LatLng(lat,longi),
@@ -204,18 +246,19 @@ socket.on("send-users", function(dataArr){
       }
        map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
       var latlng = new google.maps.LatLng(lat,longi);
-
       google.maps.event.addDomListener(window, 'load', showPosition);
   }
   function showChatWindow(title){
-        //  console.log('HELLO');
             if(uname == undefined){
               $('#error').show();
               errFlag = true;
             } else {
-              $('#chatwindow').show();
+              //$('#chatwindow').show();
              identifier = title;
+
+            $('#chatwindow').show();
             $('#bttn').attr('value', 'Send chat Request to ' + identifier);
+
               }
   }
   function createmarker(pos, title){
@@ -225,7 +268,28 @@ socket.on("send-users", function(dataArr){
                 title: title
           });
         google.maps.event.addListener(mark, 'click', function() {
-                 showChatWindow(mark.title);
+          //check if is in conv
+          //then modify and show chat window
+          console.log("uname" + uname);
+          if(uname == undefined){
+            $('#error').show();
+            errFlag = true;
+          } else {
+          socket.emit("check_status", title, uname);
+          socket.on("return_status", function(status){
+                    if(status == 2){
+                      showChatWindow(mark.title);
+                    } else if(status == 1){
+                        showChatWindow(mark.title);
+                        $('#bttn').hide();
+                        $('#chatwindow').html(mark.title + " is in a conversation ");
+                    } else {
+                              showChatWindow(mark.title);
+                              $('#bttn').hide();
+                              $('#chatwindow').html(mark.title + " has a pending request ");
+                    }
+              });
+            }
             });
              // allMarkers.push(mark);
              return mark;
@@ -237,10 +301,7 @@ socket.on("send-users", function(dataArr){
             };
             if (navigator.geolocation) {
               navigator.geolocation.getCurrentPosition(function(position) {
-                var geolocation = new google.maps.LatLng(
-                    position.coords.latitude, position.coords.longitude);
-                ac = new google.maps.places.Autocomplete(input, optns).setBounds(new google.maps.LatLngBounds(geolocation, geolocation));
-
+                var geolocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
               });
             }
           }
@@ -263,24 +324,22 @@ socket.on("send-users", function(dataArr){
                        }
                   allMarkers = [];
     		  	for(var i=0; i < dataArr.length; i++){
-
                 if(allMarkers.indexOf(dataArr[i].username) == -1){} else {
                   allMarkers.splice(indexOf(dataArr[i].username), 1);
                 }
-
-              if(dataArr.length > 1){
+         if(dataArr.length > 1){
               if(i == dataArr.length-1){
                  if((dataArr[i].lat ||  dataArr[i].longi)==(dataArr[i-1].lat ||  dataArr[i-1].longi)){
                     // This is concatenating 0.0003112 onto end of string - parse to int
-                  dataArr[i].lat = parseFloat(dataArr[i].lat) + 0.0003112;
-                  dataArr[i].longi = parseFloat(dataArr[i].longi) + 0.0003112;
+                  dataArr[i].lat = parseFloat(dataArr[i].lat) + 0.0003165;
+                  dataArr[i].longi = parseFloat(dataArr[i].longi) + 0.0003165;
                   console.log("After location Modification  " + dataArr[i].lat);
                 }
               } else {
                 if((dataArr[i].lat ||  dataArr[i].longi)==(dataArr[i+1].lat ||  dataArr[i+1].longi)){
                         // This is concatenating 0.0003112 onto end of string - parse to int
-                  dataArr[i].lat = parseFloat(dataArr[i].lat) + 0.0003112;
-                  dataArr[i].longi = parseFloat(dataArr[i].longi) + 0.0003112;
+                  dataArr[i].lat = parseFloat(dataArr[i].lat) + 0.0003165;
+                  dataArr[i].longi = parseFloat(dataArr[i].longi) + 0.0003165;
                   console.log("After location Modification  " + dataArr[i].lat);
                 }
           }
@@ -296,9 +355,6 @@ socket.on("send-users", function(dataArr){
        for(var i=0; i < allMarkers.length; i++){
           console.log("Marker : " + i + " " + allMarkers[i].title);
        }
-
     });
-
 });
-
 </script>

@@ -163,7 +163,8 @@ $(document).ready(function(){
       element.scrollTop = element.scrollHeight;
   }
 socket.on("send-users", function(dataArr){
-      for(var i=0; i< dataArr.length; i++){
+  if(dataArr.length > 0){
+      for(var i=0; i<= dataArr.length; i++){
         if(dataArr[i].username == uname){
         } else {
           console.log(dataArr[i].username);
@@ -172,7 +173,9 @@ socket.on("send-users", function(dataArr){
            allMarkers.push(marker);
           }
        }
+     }
     });
+
   }
   $sendReq.click(function(event){
     event.preventDefault();
@@ -191,6 +194,12 @@ socket.on("send-users", function(dataArr){
     $('#allRequests').append($('#incoming-request'));
       console.log("request to chat from " + from);
 
+  });
+  socket.on("convEnded", function(isin, beingrq, cp){
+    $('#chatwindow').hide();
+    console.log(isin);
+    console.log(beingrq);
+    console.log(cp);
   });
   $accReq.submit(function(event){
     event.preventDefault();

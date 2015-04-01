@@ -115,6 +115,20 @@ socket.on("accept", function(from, to){
         users[otherName].chatPartner = users[TargetName].username;
         users[otherName].emit("joined", to, from);
         users[TargetName].emit("joined", to, from);
+        console.log("------------------------------");
+        console.log("user : " + users[TargetName].username);
+        console.log("being requested : " + users[TargetName].beingRequested);
+        console.log("isinconv : " + users[TargetName].isinconv);
+        console.log("chatpartner : " + users[TargetName].chatPartner);
+        console.log("------------------------------");
+        console.log();
+        console.log("------------------------------");
+        console.log("user : " + users[otherName].username);
+        console.log("being requested : " + users[otherName].beingRequested);
+        console.log("isinconv : " + users[otherName].isinconv);
+        console.log("chatpartner : " + users[otherName].chatPartner);
+        console.log("------------------------------");
+
         });
 socket.on("decline", function(data){
         var emitTarget = users.indexOf(from);
@@ -124,20 +138,22 @@ socket.on("decline", function(data){
 
 socket.on("check_status", function(data, me){
       var msg;
-      var emitTarget = users.indexOf(data);
-      var TargetName = users[emitTarget];
-      var self = users.indexOf(me);
-      var selfName = users[self];
-      if(users[TargetName].beingRequested == true){
+      console.log("--------------------");
+      console.log("data : " + data);
+      console.log("me : " + me);
+      console.log("TargetName : " + users[data].username);
+      console.log("--------------------");
+      if(users[data].beingRequested == true){
         msg = 0;
-          users[selfName].emit("return_status", msg);
-      } else if(users[TargetName].isinconv == true){
+          users[me].emit("return_status", msg);
+      } else if(users[data].isinconv == true){
           msg = 1;
-          users[selfName].emit("return_status", msg);
+          users[me].emit("return_status", msg);
           } else {
              msg = 2;
-              users[selfName].emit("return_status", msg);
+              users[me].emit("return_status", msg);
       }
+      console.log("msg : " + msg);
 });
     socket.on("message", function(data1, data2, message){
       var emitTarget = users.indexOf(data1);
@@ -159,7 +175,22 @@ socket.on('disconnect', function(){
                 			indx = x;
                 		}
                 	}
-
+                  if(users[uname].isinconv && users[uname].chatPartner != null){
+                    //hide modal of conversation partner and reset their status
+                    var otherUser = users[uname].chatPartner;
+                    users[otherUser].isinconv = false;
+                    users[otherUser].beingRequested = false;
+                    users[otherUser].chatPartner = null;
+                      console.log("-----------------------");
+                      console.log("-----------------------");
+                      console.log("you are  : " + otherUser);
+                      console.log("isinconv : " + users[otherUser].isinconv);
+                      console.log("beingRequested : " + users[otherUser].beingRequested);
+                      console.log("chatPartner : " + users[otherUser].chatPartner);
+                       console.log("-----------------------");
+                      console.log("-----------------------");
+                    users[otherUser].emit("convEnded", uname);
+                  }
         		users.splice(indx, 1);
             userData.splice(indx, 1);
          		io.sockets.emit("remove-marker", uname);

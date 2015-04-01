@@ -41,12 +41,15 @@
       <input type="submit" class="btn btn-primary" id="bttn" value=""></input>
       </form>
       </center>
-		    <div class="input-group input-group-lg">
+		    <div class="input-group input-group-lg" id="messageSendDiv">
           <form role="form" id="sendmsg" method="POST">
           <div class="form-group">
           <input type="text" id="msg" class="form-control" placeholder="Message">&nbsp
 		 	      <input type="submit" style="height:45px;width:70px;" value="send"></input>
+          </div>
      </form>
+   </div>
+   <div id="stat"></div>
 </div>
 
 
@@ -164,7 +167,7 @@ $(document).ready(function(){
   }
 socket.on("send-users", function(dataArr){
   if(dataArr.length > 0){
-      for(var i=0; i<= dataArr.length; i++){
+      for(var i=0; i< dataArr.length; i++){
         if(dataArr[i].username == uname){
         } else {
           console.log(dataArr[i].username);
@@ -195,25 +198,27 @@ socket.on("send-users", function(dataArr){
       console.log("request to chat from " + from);
 
   });
-  socket.on("convEnded", function(isin, beingrq, cp){
-    $('#chatwindow').hide();
-    console.log(isin);
-    console.log(beingrq);
-    console.log(cp);
-  });
   $accReq.submit(function(event){
     event.preventDefault();
     socket.emit("accept", global_from, global_to);
   });
+    socket.on("convEnded", function(isin, beingrq, cp){
+    $('#chatwindow').hide();
+    $('#messages').empty();
+
+   // $('#chatwindow').hide();
+    console.log(isin);
+    console.log(beingrq);
+    console.log(cp);
+  });
   socket.on("joined", function(data1, data2){
       data_one = data1;
-      data_two = data2;
     $('#chatwindow').show();
     $('#bttn').hide();
     $sendReq.hide();
     $wait.hide();
     $('#allRequests').hide();
-    $('#chatwindow').append(data1 + " is now talking to " + data2);
+    $('#stat').html(data1 + " is now talking to " + data2);
   });
   $decReq.submit(function(event){
     event.preventDefault();
@@ -221,7 +226,7 @@ socket.on("send-users", function(dataArr){
   });
   $sendmsg.submit(function(event){
     event.preventDefault();
-    socket.emit("message", data_one, data_two, $msg.val());
+    socket.emit("message", data_one, $msg.val());
     $msg.val("");
   });
   socket.on("sendmsg", function(data){
@@ -267,6 +272,7 @@ socket.on("send-users", function(dataArr){
 
             $('#chatwindow').show();
             $('#bttn').attr('value', 'Send chat Request to ' + identifier);
+            $('#bttn').show();
 
               }
   }
@@ -288,14 +294,17 @@ socket.on("send-users", function(dataArr){
           socket.on("return_status", function(status){
                     if(status == 2){
                       showChatWindow(mark.title);
+                      $('#stat').empty();
+                      $('#messages').empty();
+
                     } else if(status == 1){
                         showChatWindow(mark.title);
                         $('#bttn').hide();
-                        $('#chatwindow').html(mark.title + " is in a conversation ");
+                        $('#stat').html(mark.title + " is in a conversation ");
                     } else {
                               showChatWindow(mark.title);
                               $('#bttn').hide();
-                              $('#chatwindow').html(mark.title + " has a pending request ");
+                              $('#stat').html(mark.title + " has a pending request ");
                     }
               });
             }
@@ -320,9 +329,9 @@ socket.on("send-users", function(dataArr){
           		if(allMarkers[x].title == data){
                 var temp = allMarkers[x].title;
           			allMarkers[x].setMap(null);
-                if(identifier == temp){
-                  $('#chatwindow').hide();
-                }
+              //  if(identifier == temp){
+              //    $('#chatwindow').hide();
+              //  }
           		}
           	}
                 console.log("Marker remove request recieved");

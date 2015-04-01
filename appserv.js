@@ -46,14 +46,14 @@ function mod_loc(dataArr){
        if(i == dataArr.length-1){
           if((dataArr[i].lat ||  dataArr[i].longi)==(dataArr[i-1].lat ||  dataArr[i-1].longi)){
              // This is concatenating 0.0003112 onto end of string - parse to int
-           dataArr[i].lat = parseFloat(dataArr[i].lat) + 0.0003165;
-           dataArr[i].longi = parseFloat(dataArr[i].longi) + 0.0003165;
+           dataArr[i].lat = parseFloat(dataArr[i].lat) + 0.0005165;
+           dataArr[i].longi = parseFloat(dataArr[i].longi) + 0.0006165;
          }
        } else {
          if((dataArr[i].lat ||  dataArr[i].longi)==(dataArr[i+1].lat ||  dataArr[i+1].longi)){
                  // This is concatenating 0.0003112 onto end of string - parse to int
-           dataArr[i].lat = parseFloat(dataArr[i].lat) + 0.0003165;
-           dataArr[i].longi = parseFloat(dataArr[i].longi) + 0.0003165;
+           dataArr[i].lat = parseFloat(dataArr[i].lat) + 0.0007165;
+           dataArr[i].longi = parseFloat(dataArr[i].longi) + 0.0009165;
          }
    }
  }
@@ -155,12 +155,10 @@ socket.on("check_status", function(data, me){
       }
       console.log("msg : " + msg);
 });
-    socket.on("message", function(data1, data2, message){
-      var emitTarget = users.indexOf(data1);
-      var TargetName = users[emitTarget];
-      var eT2 = users.indexOf(data2);
-      var TN2 = users[eT2];
-      users[TargetName].emit("sendmsg", message);
+    socket.on("message", function(you, message){
+      var TargetName = users[you];
+      var TN2 = users[you].chatPartner;
+      users[you].emit("sendmsg", message);
       users[TN2].emit("sendmsg", message);
       });
 
@@ -189,7 +187,7 @@ socket.on('disconnect', function(){
                       console.log("chatPartner : " + users[otherUser].chatPartner);
                        console.log("-----------------------");
                       console.log("-----------------------");
-                    users[otherUser].emit("convEnded", uname);
+                    users[otherUser].emit("convEnded", users[otherUser].isinconv,users[otherUser].beingRequested,users[otherUser].chatPartner);
                   }
         		users.splice(indx, 1);
             userData.splice(indx, 1);

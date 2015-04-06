@@ -45,18 +45,19 @@
           <form role="form" id="sendmsg" method="POST">
           <div class="form-group">
           <input type="text" id="msg" class="form-control" placeholder="Message">&nbsp
-		 	      <input type="submit" style="height:45px;width:70px;" value="send"></input>
+		 	      <input type="submit" style="height:45px;width:70px;" value="send" id="sendmsgbttn"></input>
           </div>
      </form>
    </div>
    <div id="stat"></div>
+ <!--  <video id='v'></video> -->
 </div>
 
 
  </center>
   <div id="map-canvas" style="width: 100%; height: 100%"></div>
 </body>
-</html>
+</html>   
 <style type="text/css">
 #messages
 {
@@ -160,7 +161,7 @@ $(document).ready(function(){
     function mpld(){
       var str =" success ";
     socket.emit("map-loaded", str);
-  }
+     }
   function updateScroll(){
       var element = document.getElementById("messages");
       element.scrollTop = element.scrollHeight;
@@ -175,10 +176,9 @@ socket.on("send-users", function(dataArr){
            var marker = createmarker(ltlng, dataArr[i].username);
            allMarkers.push(marker);
           }
-       }
-     }
-    });
-
+        }
+      }
+    }); 
   }
   $sendReq.click(function(event){
     event.preventDefault();
@@ -214,6 +214,7 @@ socket.on("send-users", function(dataArr){
   socket.on("joined", function(data1, data2){
       data_one = data1;
     $('#chatwindow').show();
+    $('#sendmsgbttn').prop('disabled', false);
     $('#bttn').hide();
     $sendReq.hide();
     $wait.hide();
@@ -273,6 +274,7 @@ socket.on("send-users", function(dataArr){
             $('#chatwindow').show();
             $('#bttn').attr('value', 'Send chat Request to ' + identifier);
             $('#bttn').show();
+            $('#sendmsgbttn').prop('disabled',true);
 
               }
   }
@@ -285,6 +287,9 @@ socket.on("send-users", function(dataArr){
         google.maps.event.addListener(mark, 'click', function() {
           //check if is in conv
           //then modify and show chat window
+          if($('#allRequests').is(":visible")){
+
+          } else { 
           console.log("uname" + uname);
           if(uname == undefined){
             $('#error').show();
@@ -308,6 +313,7 @@ socket.on("send-users", function(dataArr){
                     }
               });
             }
+          }
             });
              // allMarkers.push(mark);
              return mark;
@@ -374,5 +380,36 @@ socket.on("send-users", function(dataArr){
           console.log("Marker : " + i + " " + allMarkers[i].title);
        }
     });
+ /*window.addEventListener('DOMContentLoaded', function() {
+   var v = document.getElementById('v');
+   navigator.getUserMedia = (navigator.getUserMedia || 
+                             navigator.webkitGetUserMedia || 
+                             navigator.mozGetUserMedia || 
+                             navigator.msGetUserMedia);
+   if (navigator.getUserMedia) {
+      // Request access to video only
+      navigator.getUserMedia(
+         {
+            video:true,
+            audio:false
+         },        
+         function(stream) {
+            var url = window.URL || window.webkitURL;
+            v.src = url ? url.createObjectURL(stream) : stream;
+            v.play();
+         },
+         function(error) {
+            alert('Something went wrong. (error code ' + error.code + ')');
+            return;
+         }
+      );
+   }
+   else {
+      alert('Sorry, the browser you are using doesn\'t support getUserMedia');
+      return;
+   }
+ });
+ */
 });
+
 </script>

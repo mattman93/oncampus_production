@@ -68,7 +68,6 @@ socket.on("check-in", function(username, lat, longi){
              isinconv : false,
              chatPartner : null,
          	}
-
           	var id = makeid();
              socket.user = id
              socket.username = username;
@@ -82,9 +81,7 @@ socket.on("check-in", function(username, lat, longi){
              mod_loc(userData);
                		console.log("array len: " + users.length);
                		  socket.broadcast.emit("update-map", userData);
-        });
-
-
+                        });
 socket.on("chat-request", function(to, from){
           console.log('##### request received on server #####');
           var emitTarget = users.indexOf(to);
@@ -98,9 +95,8 @@ socket.on("chat-request", function(to, from){
           console.log("users[TargetName]" + users[TargetName].beingRequested);
           console.log("users[selfTargetName] " + users[selfTargetName].beingRequested);
               users[TargetName].emit("show-client-req", to, from);
-        });
+                        });
 socket.on("accept", function(from, to){
-
         var emitTarget = users.indexOf(from);
         var TargetName = users[emitTarget];
         console.log("emitTarget" + emitTarget);

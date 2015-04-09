@@ -1,5 +1,13 @@
  <html>
  <body>
+   <div id ="infowell" class="well well-lg">
+    <center><div>
+  <b>Welcome to OnCampus, make a user name and look for the red markers<br>
+     Click on the markers to send a chat a request</b></div><div>
+     <a href="" id="closeinfo">
+     Close <span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></div>
+     </center>
+ </div>
    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
    <link href="css/bootstrap.min.css" rel="stylesheet">
    <script src="js/bootstrap.min.js"></script>
@@ -16,7 +24,6 @@
          </form>
   </div>
 </div>
-
 <div id="error"><b> Make a user name to send a chat request</b></div>
  	<div id="contactform">
  	  <div class="col-sm-4">
@@ -46,11 +53,14 @@
           <div class="form-group">
           <input type="text" id="msg" class="form-control" placeholder="Message">&nbsp
 		 	      <input type="submit" style="height:45px;width:70px;" value="send" id="sendmsgbttn"></input>
+            <input type="submit" style="height:45px;width:70px;" value="end conversation" id="endbttn"></input>
           </div>
      </form>
    </div>
    <div id="stat"></div>
- <!--  <video id='v'></video> -->
+   
+   <div><table><tr><td>
+   <video id='v' autoplay></video> </div></td><td><div> <video id='v2' autoplay></video></div></td></tr></table>
 </div>
 
 
@@ -72,6 +82,11 @@
   top: 0;
   left: 0;
   z-index: 0;
+}
+#infowell {
+   position: relative;
+    z-index: 1; /* The z-index should be higher than Google Maps */
+    opacity: .85;
 }
 #contactform {
   position: relative;
@@ -126,6 +141,7 @@
   display:inline
   }
 </style>
+<script src="http://cdn.peerjs.com/0.3/peer.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false&key=AIzaSyAd_qUj056TQ8botUBBwAoRY8Mm5z4O8Lk&libraries=places"></script>
 <script type="text/javascript" src="http://www.google.com/jsapi"></script>
@@ -133,6 +149,8 @@
 <script>
 $(document).ready(function(){
 //  $('#chatwindow').show();
+navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+  var peer;
 	var allMarkers = [];
 	var $form    = $('#adduser');
   var $accReq = $('#accReq');
@@ -143,6 +161,7 @@ $(document).ready(function(){
   var $wait = $('#waiting');
   var $sendmsg = $('#sendmsg');
   var $msg = $('#msg');
+  var $infodiv = $('#infowell');
 	var socket  = io.connect('http://localhost:8080');
   var data_one;
   var data_two;
@@ -180,6 +199,10 @@ socket.on("send-users", function(dataArr){
       }
     }); 
   }
+  $infodiv.click(function(event){
+    event.preventDefault();
+    $infodiv.hide();
+  });
   $sendReq.click(function(event){
     event.preventDefault();
     socket.emit("chat-request", identifier, uname);
@@ -189,7 +212,9 @@ socket.on("send-users", function(dataArr){
   socket.on("show-client-req", function(to, from){
     global_to = to;
     global_from = from;
-
+    if($('#chatwindow').is(":visible")){
+      $('#chatwindow').hide();
+     }
     $('#allRequests').show();
     $('#header').html("<h1>Chat Request From " + from + "</h1>");
     $('#incoming-request').show();
@@ -198,12 +223,19 @@ socket.on("send-users", function(dataArr){
       console.log("request to chat from " + from);
 
   });
+  socket.on("senderLeft", function(data){
+     $('#allRequests').hide();
+     $("#stat").html(data);
+     $("#bttn").hide();
+     $("#chatwindow").show();
+
+  });
   $accReq.submit(function(event){
     event.preventDefault();
     socket.emit("accept", global_from, global_to);
   });
     socket.on("convEnded", function(isin, beingrq, cp){
-    $('#chatwindow').hide();
+   // $('#chatwindow').hide();
     $('#messages').empty();
 
    // $('#chatwindow').hide();
@@ -220,10 +252,84 @@ socket.on("send-users", function(dataArr){
     $wait.hide();
     $('#allRequests').hide();
     $('#stat').html(data1 + " is now talking to " + data2);
+      navigator.getUserMedia({audio: true, video: true}, function(stream){
+        // Set your video displays
+        $('#v').prop('src', URL.createObjectURL(stream));
+
+        window.localStream = stream;
+        if(peer.id == data1) {
+           peer.call(data2, stream);
+         } else {
+            peer.call(data1, stream);
+          }
+      }, function(err) {
+            console.log('Failed to get local stream' ,err);
+              });
+
+            peer.on('call', function(call){
+               call.answer(window.localStream); // Answer the call with an A/V stream.
+                if (window.existingCall) {
+                   window.existingCall.close();
+                    }
+               call.on('stream', function(stream) {
+                   $('#v2').prop('src', URL.createObjectURL(stream));
+                    });
+              });
+
+     //video();
+
   });
+  function handleCall(call){
+                    // Wait for stream on the call, then set peer video display
+                    call.on('stream', function(stream){
+                      $('#v2').prop('src', URL.createObjectURL(stream));
+                    });
+                  window.existingCall = call;
+                 }
+ function video(){
+   navigator.getUserMedia = (navigator.getUserMedia || 
+                             navigator.webkitGetUserMedia || 
+                             navigator.mozGetUserMedia || 
+                             navigator.msGetUserMedia);
+
+      navigator.getUserMedia({video: true, audio: false}, function(stream) {
+        console.log("peer identifier " +identifier);
+        var call = peer.call(identifier, stream);
+        call.on('stream', function(remoteStream) {
+            var v = document.getElementById('v');
+                  var url = window.URL || window.webkitURL;
+                    v.src = url ? url.createObjectURL(remoteStream) : remoteStream;
+                     v.play();
+                      });
+                  }, function(err) {
+            console.log('Failed to get local stream' ,err);
+              });
+
+    peer.on('call', function(call) {
+      navigator.getUserMedia({video: true, audio: false}, function(stream) {
+                 call.answer(stream); // Answer the call with an A/V stream.
+                    call.on('stream', function(remoteStream) {
+                        var v2 = document.getElementById('v2');
+                         var url = window.URL || window.webkitURL;
+                         v2.src = url ? url.createObjectURL(remoteStream) : remoteStream;
+                          v2.play();
+                       
+          // Show stream in some video/canvas element.
+                         });
+                    }, function(err) {
+                   console.log('Failed to get local stream' ,err);
+                    });
+              });
+ }
+
   $decReq.submit(function(event){
     event.preventDefault();
-    socket.emit("decline", from);
+    $('#allRequests').hide();
+    socket.emit("decline", global_from, uname);
+  });
+  socket.on("requestDeclined", function(data){
+    $('#waiting').hide();
+    $('#stat').html(data + " has declined your request =(");
   });
   $sendmsg.submit(function(event){
     event.preventDefault();
@@ -233,7 +339,6 @@ socket.on("send-users", function(dataArr){
   socket.on("sendmsg", function(data){
     $('#messages').append("<b>" + data + "</b><br>");
     updateScroll();
-
   });
   socket.on("dec", function(data){
 
@@ -247,6 +352,8 @@ socket.on("send-users", function(dataArr){
   	socket.emit("check-in", $username.val(), lat, longi);
   	$form.hide();
   	$registerwell.hide();
+      peer = new Peer($username.val(), {key: 'swief3vleg66r'});
+        console.log("peer : " + peer.id);
   });
   function showPosition(position){
        lat = position.coords.latitude.toString().substr(0,8);
@@ -380,7 +487,7 @@ socket.on("send-users", function(dataArr){
           console.log("Marker : " + i + " " + allMarkers[i].title);
        }
     });
- /*window.addEventListener('DOMContentLoaded', function() {
+/* window.addEventListener('DOMContentLoaded', function() {
    var v = document.getElementById('v');
    navigator.getUserMedia = (navigator.getUserMedia || 
                              navigator.webkitGetUserMedia || 

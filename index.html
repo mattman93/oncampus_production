@@ -24,7 +24,7 @@
          </form>
   </div>
 </div>
-<div id="error"><b> Make a user name to send a chat request</b></div>
+<div id="error"></div>
  	<div id="contactform">
  	  <div class="col-sm-4">
           <div id ="registerwell" class="well well-lg">
@@ -49,18 +49,19 @@
       </form>
       </center>
 		    <div class="input-group input-group-lg" id="messageSendDiv">
-          <form role="form" id="sendmsg" method="POST">
+          <form role="form" id="sendmsg"> 
           <div class="form-group">
           <input type="text" id="msg" class="form-control" placeholder="Message">&nbsp
-		 	      <input type="submit" style="height:45px;width:70px;" value="send" id="sendmsgbttn"></input>
-            <input type="submit" style="height:45px;width:70px;" value="end conversation" id="endbttn"></input>
+		 	      <!-- <input type="submit" style="height:45px;width:70px;" value="send" id="sendmsgbttn"></input> -->
+             <button type="button" class="btn btn-success" id="sendmsgbttn">Send Message</button>
+            <button type="button" class="btn btn-danger" id="endbttn">End Conversation</button>
+           <!-- <input type="submit" style="height:45px;width:70px;" value="end conversation" id="endbttn"></input> -->
           </div>
-     </form>
+     </form> 
+         <div><table><tr><td>
+   <video id='v' width="320" height="180" autoplay></video> </div></td><td><div> <video id='v2' width="320" height="180" autoplay></video></div></td></tr></table>
    </div>
-   <div id="stat"></div>
-   
-   <div><table><tr><td>
-   <video id='v' autoplay></video> </div></td><td><div> <video id='v2' autoplay></video></div></td></tr></table>
+   <div id="stat"></div>  
 </div>
 
 
@@ -117,10 +118,11 @@
 	display: none;
 	position: relative;
     resize: both;
-	margin-left: 300 ;
-  margin-right: 300 ;
-  height: 250px;
-	z-index: 2;
+	margin-left: 300;
+  margin-right: 300;
+  bottom: 210px;
+  height: 400px;
+	z-index: 1;
 }
 #error {
   display: none;
@@ -151,6 +153,8 @@ $(document).ready(function(){
 //  $('#chatwindow').show();
 navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
   var peer;
+  var global_call_var;
+  var localMediaStream;
 	var allMarkers = [];
 	var $form    = $('#adduser');
   var $accReq = $('#accReq');
@@ -235,8 +239,11 @@ socket.on("send-users", function(dataArr){
     socket.emit("accept", global_from, global_to);
   });
     socket.on("convEnded", function(isin, beingrq, cp){
-   // $('#chatwindow').hide();
+    $('#chatwindow').hide();
     $('#messages').empty();
+    $('#stat').empty();
+    global_call_var.close();
+    localMediaStream.stop();
 
    // $('#chatwindow').hide();
     console.log(isin);
@@ -247,6 +254,7 @@ socket.on("send-users", function(dataArr){
       data_one = data1;
     $('#chatwindow').show();
     $('#sendmsgbttn').prop('disabled', false);
+    $('#endbttn').prop('disabled', false);
     $('#bttn').hide();
     $sendReq.hide();
     $wait.hide();
@@ -255,7 +263,7 @@ socket.on("send-users", function(dataArr){
       navigator.getUserMedia({audio: true, video: true}, function(stream){
         // Set your video displays
         $('#v').prop('src', URL.createObjectURL(stream));
-
+        localMediaStream = stream;
         window.localStream = stream;
         if(peer.id == data1) {
            peer.call(data2, stream);
@@ -267,6 +275,7 @@ socket.on("send-users", function(dataArr){
               });
 
             peer.on('call', function(call){
+              global_call_var = call;
                call.answer(window.localStream); // Answer the call with an A/V stream.
                 if (window.existingCall) {
                    window.existingCall.close();
@@ -275,8 +284,6 @@ socket.on("send-users", function(dataArr){
                    $('#v2').prop('src', URL.createObjectURL(stream));
                     });
               });
-
-     //video();
 
   });
   function handleCall(call){
@@ -331,6 +338,11 @@ socket.on("send-users", function(dataArr){
     $('#waiting').hide();
     $('#stat').html(data + " has declined your request =(");
   });
+  $('#sendmsgbttn').click(function(event){
+    event.preventDefault();
+    socket.emit("message", data_one, $msg.val());
+    $msg.val("");
+  });
   $sendmsg.submit(function(event){
     event.preventDefault();
     socket.emit("message", data_one, $msg.val());
@@ -345,6 +357,10 @@ socket.on("send-users", function(dataArr){
   });
   $form.submit(function(event){
   	event.preventDefault();
+    if($username.val() == '' || null || undefined){
+        $('#error').html("<b> must enter a user name </b>");
+        $('#error').show();
+    } else {
   	uname = $username.val();
     if(errFlag){
         $('#error').hide();
@@ -354,6 +370,7 @@ socket.on("send-users", function(dataArr){
   	$registerwell.hide();
       peer = new Peer($username.val(), {key: 'swief3vleg66r'});
         console.log("peer : " + peer.id);
+    }
   });
   function showPosition(position){
        lat = position.coords.latitude.toString().substr(0,8);
@@ -372,6 +389,7 @@ socket.on("send-users", function(dataArr){
   }
   function showChatWindow(title){
             if(uname == undefined){
+               $('#error').html("<b> Make a user name to send a chat request</b>")
               $('#error').show();
               errFlag = true;
             } else {
@@ -382,6 +400,7 @@ socket.on("send-users", function(dataArr){
             $('#bttn').attr('value', 'Send chat Request to ' + identifier);
             $('#bttn').show();
             $('#sendmsgbttn').prop('disabled',true);
+            $('#endbttn').prop('disabled',true);
 
               }
   }

@@ -6,6 +6,7 @@ var url = require('url');
 var http = require('http');
 var mysql = require('mysql');
 
+
 server.listen(8080);
 
   function init(request, response){
@@ -92,6 +93,8 @@ socket.on("chat-request", function(to, from){
           var selfTargetName = users[selfTarget];
           users[selfTargetName].beingRequested = true;
           users[TargetName].beingRequested = true;
+          users[from].chatPartner = to;
+          users[to].chatPartner = from;
           console.log("users[TargetName]" + users[TargetName].beingRequested);
           console.log("users[selfTargetName] " + users[selfTargetName].beingRequested);
               users[TargetName].emit("show-client-req", to, from);
@@ -99,6 +102,10 @@ socket.on("chat-request", function(to, from){
 socket.on("accept", function(from, to){
         var emitTarget = users.indexOf(from);
         var TargetName = users[emitTarget];
+          if((emitTarget == -1) || (TargetName == undefined)){
+            var msg = " chat partner left =( ";
+             users[to].emit("senderLeft", msg);
+                 } else {
         console.log("emitTarget" + emitTarget);
         console.log("TargetName " + TargetName);
         var other = users.indexOf(to);
@@ -124,12 +131,17 @@ socket.on("accept", function(from, to){
         console.log("isinconv : " + users[otherName].isinconv);
         console.log("chatpartner : " + users[otherName].chatPartner);
         console.log("------------------------------");
-
+    }
         });
-socket.on("decline", function(data){
-        var emitTarget = users.indexOf(from);
-        var TargetName = users[emitTarget];
+socket.on("decline", function(from, uname){
+     //   var emitTarget = users.indexOf(from);
+       // var TargetName = users[emitTarget];
         //socket.emit("dec", )
+        console.log("from : " + from);
+        console.log("uname : " + uname);
+          users[uname].beingRequested = false;
+          users[from].beingRequested = false;
+          users[from].emit("requestDeclined", uname);
     });
 
 socket.on("check_status", function(data, me){
@@ -169,6 +181,17 @@ socket.on('disconnect', function(){
                 			indx = x;
                 		}
                 	}
+                  //chatpartner isn't set weiner
+                   if(users[uname].beingRequested && users[uname].chatPartner != null)
+                   {
+                    console.log("user left");
+                    console.log("chat partner " + users[uname].chatPartner);
+                      var otherUser = users[uname].chatPartner;
+                       users[otherUser].isinconv = false;
+                        users[otherUser].beingRequested = false;
+                         users[otherUser].chatPartner = null;
+                          users[otherUser].emit("convEnded", users[otherUser].isinconv,users[otherUser].beingRequested,users[otherUser].chatPartner);
+                   }
                   if(users[uname].isinconv && users[uname].chatPartner != null){
                     //hide modal of conversation partner and reset their status
                     var otherUser = users[uname].chatPartner;

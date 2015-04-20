@@ -49,7 +49,7 @@
       </form>
       </center>
 		    <div class="input-group input-group-lg" id="messageSendDiv">
-          <form role="form" id="sendmsg"> 
+          <form role="form" id="sendmsg" method="post"> 
           <div class="form-group">
           <input type="text" id="msg" class="form-control" placeholder="Message">&nbsp
 		 	      <!-- <input type="submit" style="height:45px;width:70px;" value="send" id="sendmsgbttn"></input> -->
@@ -58,15 +58,16 @@
            <!-- <input type="submit" style="height:45px;width:70px;" value="end conversation" id="endbttn"></input> -->
           </div>
      </form> 
-         <div><table><tr><td>
+      <div><a href="" id="closeChatWindow"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Hide Window</a></div><table><tr><td>
    <video id='v' width="320" height="180" autoplay></video> </div></td><td><div> <video id='v2' width="320" height="180" autoplay></video></div></td></tr></table>
    </div>
-   <div id="stat"></div>  
+   <div id="stat"></div>
 </div>
-
-
  </center>
   <div id="map-canvas" style="width: 100%; height: 100%"></div>
+  <div id="hiddenChatWindow" class="well well-lg">
+<div><a href="" id="openChatWindow"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Show Window</a></div>
+</div>
 </body>
 </html>   
 <style type="text/css">
@@ -75,6 +76,13 @@
    height:80px;
     overflow:scroll;
     overflow-x:hidden;
+}
+#hiddenChatWindow {
+  display: none;
+  position: absolute;
+  z-index: 1;
+   opacity: .95;
+   bottom: 2px;
 }
 #map-canvas {
   height: 100%;
@@ -153,8 +161,8 @@ $(document).ready(function(){
 //  $('#chatwindow').show();
 navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
   var peer;
-  var global_call_var;
-  var localMediaStream;
+  var global_call_var = null;
+  var localMediaStream = null;
 	var allMarkers = [];
 	var $form    = $('#adduser');
   var $accReq = $('#accReq');
@@ -166,6 +174,9 @@ navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia 
   var $sendmsg = $('#sendmsg');
   var $msg = $('#msg');
   var $infodiv = $('#infowell');
+  var $msgbox = $('#msg');
+  var $CWbttn = $('#closeChatWindow');
+  var $OWbttn = $('#openChatWindow');
 	var socket  = io.connect('http://localhost:8080');
   var data_one;
   var data_two;
@@ -177,13 +188,14 @@ navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia 
   var errFlag = false;
   var global_to;
   var global_from;
+  $msgbox.prop("disabled", true);
   if (navigator.geolocation){
   	geolocate();
     navigator.geolocation.getCurrentPosition(showPosition);
     window.onload = mpld();
     function mpld(){
       var str =" success ";
-    socket.emit("map-loaded", str);
+    //socket.emit("map-loaded", str);
      }
   function updateScroll(){
       var element = document.getElementById("messages");
@@ -191,7 +203,7 @@ navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia 
   }
 socket.on("send-users", function(dataArr){
   if(dataArr.length > 0){
-      for(var i=0; i< dataArr.length; i++){
+      for(var i=0; i < dataArr.length; i++){
         if(dataArr[i].username == uname){
         } else {
           console.log(dataArr[i].username);
@@ -200,6 +212,8 @@ socket.on("send-users", function(dataArr){
            allMarkers.push(marker);
           }
         }
+      } else {
+        console.log('no one online');
       }
     }); 
   }
@@ -227,24 +241,44 @@ socket.on("send-users", function(dataArr){
       console.log("request to chat from " + from);
 
   });
-  socket.on("senderLeft", function(data){
+  socket.on("senderLeft", function(){
      $('#allRequests').hide();
-     $("#stat").html(data);
+     $("#stat").html();
      $("#bttn").hide();
-     $("#chatwindow").show();
-
   });
   $accReq.submit(function(event){
     event.preventDefault();
     socket.emit("accept", global_from, global_to);
   });
+  $CWbttn.click(function(event){
+    event.preventDefault();
+    $('#chatwindow').hide();
+    $('#hiddenChatWindow').show();
+  });
+  $OWbttn.click(function(event){
+    event.preventDefault();
+    $('#chatwindow').show();
+    $('#hiddenChatWindow').hide();
+  });
+  $('#endbttn').click(function(event){
+    event.preventDefault();
+    socket.emit("end", uname);
+    $('#chatwindow').hide();
+    $('#messages').empty();
+    $('#stat').empty();
+    if(localMediaStream){
+    localMediaStream.stop();
+      }
+  });
     socket.on("convEnded", function(isin, beingrq, cp){
     $('#chatwindow').hide();
     $('#messages').empty();
     $('#stat').empty();
-    global_call_var.close();
-    localMediaStream.stop();
 
+    if((global_call_var && localMediaStream) != '' || undefined || null){
+      global_call_var.close();
+      localMediaStream.stop();
+    }
    // $('#chatwindow').hide();
     console.log(isin);
     console.log(beingrq);
@@ -253,6 +287,7 @@ socket.on("send-users", function(dataArr){
   socket.on("joined", function(data1, data2){
       data_one = data1;
     $('#chatwindow').show();
+    $msgbox.prop('disabled', false);
     $('#sendmsgbttn').prop('disabled', false);
     $('#endbttn').prop('disabled', false);
     $('#bttn').hide();
@@ -260,7 +295,7 @@ socket.on("send-users", function(dataArr){
     $wait.hide();
     $('#allRequests').hide();
     $('#stat').html(data1 + " is now talking to " + data2);
-      navigator.getUserMedia({audio: true, video: true}, function(stream){
+      navigator.getUserMedia({audio: false, video: true}, function(stream){
         // Set your video displays
         $('#v').prop('src', URL.createObjectURL(stream));
         localMediaStream = stream;
@@ -384,6 +419,7 @@ socket.on("send-users", function(dataArr){
         mapTypeId: google.maps.MapTypeId.ROADMAP
       }
        map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+       socket.emit("map-loaded");
       var latlng = new google.maps.LatLng(lat,longi);
       google.maps.event.addDomListener(window, 'load', showPosition);
   }
@@ -423,7 +459,10 @@ socket.on("send-users", function(dataArr){
           } else {
           socket.emit("check_status", title, uname);
           socket.on("return_status", function(status){
-                    if(status == 2){
+                    if(status == 3){
+                     $('#stat').html("You are already in a conversation! don't be rude ");
+                            }
+                      else if(status == 2){
                       showChatWindow(mark.title);
                       $('#stat').empty();
                       $('#messages').empty();
@@ -481,15 +520,15 @@ socket.on("send-users", function(dataArr){
               if(i == dataArr.length-1){
                  if((dataArr[i].lat ||  dataArr[i].longi)==(dataArr[i-1].lat ||  dataArr[i-1].longi)){
                     // This is concatenating 0.0003112 onto end of string - parse to int
-                  dataArr[i].lat = parseFloat(dataArr[i].lat) + 0.0003165;
-                  dataArr[i].longi = parseFloat(dataArr[i].longi) + 0.0003165;
+                  dataArr[i].lat = parseFloat(dataArr[i].lat) + 0.0006165;
+                  dataArr[i].longi = parseFloat(dataArr[i].longi) + 0.0004165;
                   console.log("After location Modification  " + dataArr[i].lat);
                 }
               } else {
                 if((dataArr[i].lat ||  dataArr[i].longi)==(dataArr[i+1].lat ||  dataArr[i+1].longi)){
                         // This is concatenating 0.0003112 onto end of string - parse to int
-                  dataArr[i].lat = parseFloat(dataArr[i].lat) + 0.0003165;
-                  dataArr[i].longi = parseFloat(dataArr[i].longi) + 0.0003165;
+                  dataArr[i].lat = parseFloat(dataArr[i].lat) + 0.0004165;
+                  dataArr[i].longi = parseFloat(dataArr[i].longi) + 0.0006165;
                   console.log("After location Modification  " + dataArr[i].lat);
                 }
           }

@@ -33,7 +33,7 @@
               <div class="form-group">
                 <label for="UserNameRegister">Username</label>
                 <input type="text" name = "registerusername" class="form-control" id="UserNameRegister" placeholder="Register Username">
-                 <input type="submit" style="height:35px; width:65px" value="register"></input>
+                 <input type="submit" style="height:35px; width:65px" value="register" id="registerBttn"></input>
               </div>
          	</div>
          </div>
@@ -151,14 +151,13 @@
   display:inline
   }
 </style>
-<script src="http://cdn.peerjs.com/0.3/peer.min.js"></script>
+<script src="/onCampus2/peer.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false&key=AIzaSyAd_qUj056TQ8botUBBwAoRY8Mm5z4O8Lk&libraries=places"></script>
 <script type="text/javascript" src="http://www.google.com/jsapi"></script>
 <script src="http://localhost:8080/socket.io/socket.io.js"></script>
 <script>
 $(document).ready(function(){
-//  $('#chatwindow').show();
 navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
   var peer;
   var global_call_var = null;
@@ -168,6 +167,7 @@ navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia 
   var $accReq = $('#accReq');
   var $decReq = $('#decReq');
 	var $username = $('#UserNameRegister');
+  var $registerBttn = $('#registerBttn');
 	var $registerwell = $('#registerwell');
   var $sendReq = $('#bttn');
   var $wait = $('#waiting');
@@ -189,6 +189,19 @@ navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia 
   var global_to;
   var global_from;
   $msgbox.prop("disabled", true);
+  $username.prop('disabled', true);
+  $registerBttn.prop('disabled', true);
+  navigator.geolocation.watchPosition(function(position) {
+  console.log("loc enabled");
+      $username.prop('disabled', false);
+       $registerBttn.prop('disabled', false);
+      },
+      function (error) { 
+          if (error.code == error.PERMISSION_DENIED)
+           console.log("location blocked");
+           $('#error').html("<b>You must enable your browsers geolocation</b>");
+           $('#error').show();
+        });
   if (navigator.geolocation){
   	geolocate();
     navigator.geolocation.getCurrentPosition(showPosition);
@@ -406,6 +419,16 @@ socket.on("send-users", function(dataArr){
       peer = new Peer($username.val(), {key: 'swief3vleg66r'});
         console.log("peer : " + peer.id);
     }
+    var latlng = new google.maps.LatLng(lat,longi);
+    var marker = new google.maps.Marker({ 
+        position: latlng, 
+        map: map, 
+        flat: true, 
+        title: "Me : " + uname, 
+        draggable: false 
+      });
+    iconFile = 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'; 
+    marker.setIcon(iconFile);
   });
   function showPosition(position){
        lat = position.coords.latitude.toString().substr(0,8);

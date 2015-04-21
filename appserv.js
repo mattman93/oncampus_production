@@ -135,9 +135,6 @@ socket.on("accept", function(from, to){
     }
         });
 socket.on("decline", function(from, uname){
-     //   var emitTarget = users.indexOf(from);
-       // var TargetName = users[emitTarget];
-        //socket.emit("dec", )
         console.log("from : " + from);
         console.log("uname : " + uname);
           users[uname].beingRequested = false;

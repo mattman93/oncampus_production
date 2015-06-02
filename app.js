@@ -4,7 +4,6 @@ var fs = require('fs');
 var path = require('path');
 var url = require('url');
 var http = require('http');
-var mysql = require('mysql');
 
 
 server.listen(8080);
@@ -27,8 +26,7 @@ server.listen(8080);
 
    io.sockets.on('connection', function(socket){
 
-   	  socket.on("map-loaded", function(){
-        console.log("CHEESE");
+   	  socket.on("map-loaded", function(lat, longi){
 
     	 socket.emit("send-users", userData);
    	});
@@ -57,9 +55,9 @@ function mod_loc(dataArr){
            dataArr[i].lat = parseFloat(dataArr[i].lat) + 0.0007165;
            dataArr[i].longi = parseFloat(dataArr[i].longi) + 0.0009165;
          }
-        }
-      }
-    }
+   }
+ }
+}
 }
 socket.on("check-in", function(username, lat, longi){
       	var user = {
@@ -94,8 +92,6 @@ socket.on("chat-request", function(to, from){
           var selfTargetName = users[selfTarget];
           users[selfTargetName].beingRequested = true;
           users[TargetName].beingRequested = true;
-          users[from].chatPartner = to;
-          users[to].chatPartner = from;
           console.log("users[TargetName]" + users[TargetName].beingRequested);
           console.log("users[selfTargetName] " + users[selfTargetName].beingRequested);
               users[TargetName].emit("show-client-req", to, from);
@@ -135,6 +131,9 @@ socket.on("accept", function(from, to){
     }
         });
 socket.on("decline", function(from, uname){
+     //   var emitTarget = users.indexOf(from);
+       // var TargetName = users[emitTarget];
+        //socket.emit("dec", )
         console.log("from : " + from);
         console.log("uname : " + uname);
           users[uname].beingRequested = false;
@@ -144,10 +143,6 @@ socket.on("decline", function(from, uname){
 
 socket.on("check_status", function(data, me){
       var msg;
-      if(users[me].isinconv){
-        msg = 3;
-        users[me].emit("return_status", msg);
-      } else {
       console.log("--------------------");
       console.log("data : " + data);
       console.log("me : " + me);
@@ -163,32 +158,16 @@ socket.on("check_status", function(data, me){
              msg = 2;
               users[me].emit("return_status", msg);
       }
-    }
       console.log("msg : " + msg);
-
 });
     socket.on("message", function(you, message){
       var TargetName = users[you];
       var TN2 = users[you].chatPartner;
-      users[you].emit("sendmsg", message, you);
-      users[TN2].emit("sendmsg", message, you);
+      users[you].emit("sendmsg", message);
+      users[TN2].emit("sendmsg", message);
       });
 
-socket.on("end", function(uname){
 
-  if(uname == undefined){} else {
-                  if(users[uname].isinconv && users[uname].chatPartner != null){
-                    var otherUser = users[uname].chatPartner;
-                    users[otherUser].isinconv = false;
-                    users[otherUser].beingRequested = false;
-                    users[otherUser].chatPartner = null;
-                    users[uname].isinconv = false;
-                    users[uname].beingRequested = false;
-                    users[uname].chatPartner = null;
-                    users[otherUser].emit("convEnded", users[otherUser].isinconv,users[otherUser].beingRequested,users[otherUser].chatPartner);
-                  }
-      }
-        });
 socket.on('disconnect', function(){
   //check if was in conversation or sending/pending a request
   // if so then send
@@ -199,17 +178,6 @@ socket.on('disconnect', function(){
                 			indx = x;
                 		}
                 	}
-                  //chatpartner isn't set weiner
-                   if(users[uname].beingRequested && users[uname].chatPartner != null)
-                   {
-                    console.log("user left");
-                    console.log("chat partner " + users[uname].chatPartner);
-                      var otherUser = users[uname].chatPartner;
-                       users[otherUser].isinconv = false;
-                        users[otherUser].beingRequested = false;
-                         users[otherUser].chatPartner = null;
-                          users[otherUser].emit("senderLeft");
-                   }
                   if(users[uname].isinconv && users[uname].chatPartner != null){
                     //hide modal of conversation partner and reset their status
                     var otherUser = users[uname].chatPartner;

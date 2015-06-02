@@ -152,13 +152,15 @@
   }
 </style>
 <script src="/onCampus2/peer.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false&key=AIzaSyAd_qUj056TQ8botUBBwAoRY8Mm5z4O8Lk&libraries=places"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js">
+  </script>
+  <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false&key=AIzaSyAd_qUj056TQ8botUBBwAoRY8Mm5z4O8Lk&libraries=places"></script>
 <script type="text/javascript" src="http://www.google.com/jsapi"></script>
 <script src="http://localhost:8080/socket.io/socket.io.js"></script>
 <script>
 $(document).ready(function(){
-navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+  console.log("script path : " + $(location).attr('pathname'));
+    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
   var peer;
   var global_call_var = null;
   var localMediaStream = null;
@@ -247,55 +249,56 @@ socket.on("send-users", function(dataArr){
       $('#chatwindow').hide();
      }
     $('#allRequests').show();
-    $('#header').html("<h1>Chat Request From " + from + "</h1>");
-    $('#incoming-request').show();
-    $('#recReq').show();
-    $('#allRequests').append($('#incoming-request'));
-      console.log("request to chat from " + from);
+     $('#header').html("<h1>Chat Request From " + from + "</h1>");
+       $('#incoming-request').show();
+         $('#recReq').show();
+           $('#allRequests').append($('#incoming-request'));
+            console.log("request to chat from " + from);
 
   });
   socket.on("senderLeft", function(){
      $('#allRequests').hide();
-     $("#stat").html();
-     $("#bttn").hide();
+        $("#stat").html();
+            $("#bttn").hide();
   });
   $accReq.submit(function(event){
     event.preventDefault();
-    socket.emit("accept", global_from, global_to);
+       socket.emit("accept", global_from, global_to);
   });
   $CWbttn.click(function(event){
     event.preventDefault();
-    $('#chatwindow').hide();
-    $('#hiddenChatWindow').show();
+      $('#chatwindow').hide();
+        $('#hiddenChatWindow').show();
   });
   $OWbttn.click(function(event){
     event.preventDefault();
     $('#chatwindow').show();
-    $('#hiddenChatWindow').hide();
+     $('#hiddenChatWindow').hide();
   });
   $('#endbttn').click(function(event){
     event.preventDefault();
     socket.emit("end", uname);
     $('#chatwindow').hide();
-    $('#messages').empty();
-    $('#stat').empty();
-    if(localMediaStream){
-    localMediaStream.stop();
-      }
+       $('#messages').empty();
+           $('#stat').empty();
+            if(localMediaStream){
+            localMediaStream.stop();
+              }
   });
     socket.on("convEnded", function(isin, beingrq, cp){
     $('#chatwindow').hide();
-    $('#messages').empty();
-    $('#stat').empty();
+       $('#messages').empty();
+           $('#stat').empty();
 
     if((global_call_var && localMediaStream) != '' || undefined || null){
       global_call_var.close();
       localMediaStream.stop();
     }
-   // $('#chatwindow').hide();
+
     console.log(isin);
     console.log(beingrq);
     console.log(cp);
+
   });
   socket.on("joined", function(data1, data2){
       data_one = data1;
@@ -341,7 +344,7 @@ socket.on("send-users", function(dataArr){
                     });
                   window.existingCall = call;
                  }
- function video(){
+   function video(){
    navigator.getUserMedia = (navigator.getUserMedia || 
                              navigator.webkitGetUserMedia || 
                              navigator.mozGetUserMedia || 
@@ -376,59 +379,64 @@ socket.on("send-users", function(dataArr){
                     });
               });
  }
-
   $decReq.submit(function(event){
     event.preventDefault();
-    $('#allRequests').hide();
-    socket.emit("decline", global_from, uname);
+      $('#allRequests').hide();
+       socket.emit("decline", global_from, uname);
   });
   socket.on("requestDeclined", function(data){
     $('#waiting').hide();
-    $('#stat').html(data + " has declined your request =(");
-  });
+      $('#stat').html(data + " has declined your request =(");
+             });
   $('#sendmsgbttn').click(function(event){
     event.preventDefault();
-    socket.emit("message", data_one, $msg.val());
-    $msg.val("");
-  });
+      socket.emit("message", data_one, $msg.val());
+            $msg.val("");
+                 });
   $sendmsg.submit(function(event){
     event.preventDefault();
-    socket.emit("message", data_one, $msg.val());
-    $msg.val("");
-  });
-  socket.on("sendmsg", function(data){
-    $('#messages').append("<b>" + data + "</b><br>");
-    updateScroll();
-  });
+       socket.emit("message", data_one, $msg.val());
+          $msg.val("");
+                 });
+  socket.on("sendmsg", function(data, you){
+    console.log("self : " + you);
+         $('#messages').append("<b>" + you + " : " + data + "</b><br>");
+            updateScroll();
+                 
+                 });
   socket.on("dec", function(data){
-
-  });
+   });
   $form.submit(function(event){
-  	event.preventDefault();
-    if($username.val() == '' || null || undefined){
-        $('#error').html("<b> must enter a user name </b>");
-        $('#error').show();
+   var valid = false;
+    event.preventDefault();
+       if($username.val() == '' || null || undefined){
+          $('#error').html("<b> must enter a user name </b>");
+             $('#error').show();
+        valid = true;
     } else {
-  	uname = $username.val();
-    if(errFlag){
+    uname = $username.val();
+      if(errFlag){
+          $('#error').hide();
+      }
+    socket.emit("check-in", $username.val(), lat, longi);
+      $form.hide();
         $('#error').hide();
-    }
-  	socket.emit("check-in", $username.val(), lat, longi);
-  	$form.hide();
-  	$registerwell.hide();
-      peer = new Peer($username.val(), {key: 'swief3vleg66r'});
-        console.log("peer : " + peer.id);
-    }
-    var latlng = new google.maps.LatLng(lat,longi);
-    var marker = new google.maps.Marker({ 
-        position: latlng, 
-        map: map, 
-        flat: true, 
-        title: "Me : " + uname, 
-        draggable: false 
-      });
-    iconFile = 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'; 
-    marker.setIcon(iconFile);
+          $registerwell.hide();
+            peer = new Peer($username.val(), {key: 'j7c1qbwja038r529'});
+              console.log("peer : " + peer.id);
+       }
+    if(!valid){
+        var latlng = new google.maps.LatLng(lat,longi); 
+          var marker = new google.maps.Marker({ 
+            position: latlng, 
+            map: map, 
+            flat: true, 
+            title: "Me : " + uname, 
+            draggable: false 
+         });
+         iconFile = 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'; 
+        marker.setIcon(iconFile);
+      }
   });
   function showPosition(position){
        lat = position.coords.latitude.toString().substr(0,8);
@@ -449,20 +457,21 @@ socket.on("send-users", function(dataArr){
   function showChatWindow(title){
             if(uname == undefined){
                $('#error').html("<b> Make a user name to send a chat request</b>")
-              $('#error').show();
-              errFlag = true;
-            } else {
-              //$('#chatwindow').show();
-             identifier = title;
+                $('#error').show();
+                 errFlag = true;
+                   } else {
+                  //$('#chatwindow').show();
+                   identifier = title;
 
-            $('#chatwindow').show();
-            $('#bttn').attr('value', 'Send chat Request to ' + identifier);
-            $('#bttn').show();
-            $('#sendmsgbttn').prop('disabled',true);
-            $('#endbttn').prop('disabled',true);
+                  $('#chatwindow').show();
+                  $('#bttn').attr('value', 'Send chat Request to ' + identifier);
+                  $('#bttn').show();
+                  $('#sendmsgbttn').prop('disabled',true);
+                  $('#endbttn').prop('disabled',true);
 
-              }
-  }
+          }
+      } 
+
   function createmarker(pos, title){
     var mark = new google.maps.Marker({
                 position: pos,
@@ -498,14 +507,13 @@ socket.on("send-users", function(dataArr){
                               showChatWindow(mark.title);
                               $('#bttn').hide();
                               $('#stat').html(mark.title + " has a pending request ");
-                    }
-              });
-            }
-          }
+                     }
+                  });
+                }
+              }
             });
-             // allMarkers.push(mark);
              return mark;
-  }
+       }
   function geolocate() {
             var input = document.getElementById('AddressRegister');
             var optns = {
@@ -523,9 +531,6 @@ socket.on("send-users", function(dataArr){
           		if(allMarkers[x].title == data){
                 var temp = allMarkers[x].title;
           			allMarkers[x].setMap(null);
-              //  if(identifier == temp){
-              //    $('#chatwindow').hide();
-              //  }
           		}
           	}
                 console.log("Marker remove request recieved");
@@ -553,51 +558,20 @@ socket.on("send-users", function(dataArr){
                   dataArr[i].lat = parseFloat(dataArr[i].lat) + 0.0004165;
                   dataArr[i].longi = parseFloat(dataArr[i].longi) + 0.0006165;
                   console.log("After location Modification  " + dataArr[i].lat);
-                }
-          }
+                   }
+             }
         }
     				if(dataArr[i].username == uname){
             } else {
 	    			var ltlng = new google.maps.LatLng(dataArr[i].lat,dataArr[i].longi);
             var marker = createmarker(ltlng, dataArr[i].username);
             allMarkers.push(marker);
-	    	}
+	    	    }
     	 }
        console.log("listing markers array from map update ");
        for(var i=0; i < allMarkers.length; i++){
           console.log("Marker : " + i + " " + allMarkers[i].title);
-       }
+                }
+          });
     });
-/* window.addEventListener('DOMContentLoaded', function() {
-   var v = document.getElementById('v');
-   navigator.getUserMedia = (navigator.getUserMedia || 
-                             navigator.webkitGetUserMedia || 
-                             navigator.mozGetUserMedia || 
-                             navigator.msGetUserMedia);
-   if (navigator.getUserMedia) {
-      // Request access to video only
-      navigator.getUserMedia(
-         {
-            video:true,
-            audio:false
-         },        
-         function(stream) {
-            var url = window.URL || window.webkitURL;
-            v.src = url ? url.createObjectURL(stream) : stream;
-            v.play();
-         },
-         function(error) {
-            alert('Something went wrong. (error code ' + error.code + ')');
-            return;
-         }
-      );
-   }
-   else {
-      alert('Sorry, the browser you are using doesn\'t support getUserMedia');
-      return;
-   }
- });
- */
-});
-
 </script>

@@ -1,0 +1,19 @@
+{
+  "name": "onCampus2",
+  "description": "location based chat app",
+  "version": "0.0.1",
+  "author": "Matthew Cieslak",
+  "homepage": "http://modulus.io",
+  "main": "app.js",
+  "dependencies": {
+    "socket.io": "latest",
+    "express": "latest"
+  },
+  "engines": {
+    "node": "0.10.18"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "license": "BSD-2-Clause"
+}

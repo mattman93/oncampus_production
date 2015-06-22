@@ -6,7 +6,7 @@ var url = require('url');
 var http = require('http');
 
 
-server.listen(8080);
+server.listen(80);
 
   function init(request, response){
   fs.readFile(__dirname + '/index.html',

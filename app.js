@@ -7,7 +7,7 @@ var http = require('http');
 
 
 server.listen(8080);
-
+console.log("server started");
   function init(request, response){
   fs.readFile(__dirname + '/index.html',
     function(err, data){

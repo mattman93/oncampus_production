@@ -1,4 +1,4 @@
- <html>
+<html>
  <body>
    <div id ="infowell" class="well well-lg">
     <center><div>
@@ -25,8 +25,8 @@
   </div>
 </div>
 <div id="error"></div>
- 	<div id="contactform">
- 	  <div class="col-sm-4">
+  <div id="contactform">
+    <div class="col-sm-4">
           <div id ="registerwell" class="well well-lg">
             <center>
               <form role="form" id="adduser" method="POST">
@@ -35,31 +35,31 @@
                 <input type="text" name = "registerusername" class="form-control" id="UserNameRegister" placeholder="Register Username">
                  <input type="submit" style="height:35px; width:65px" value="register" id="registerBttn"></input>
               </div>
-         	</div>
+          </div>
          </div>
      </div>
-
-
 <div class="panel panel-primary" id="chatwindow">
-  		<br><center>
+      <br><center>
         <div id="messages"></div>
       <div id="waiting"><b>Waiting...</b></div>
       <form id="chatReq">
       <input type="submit" class="btn btn-primary" id="bttn" value=""></input>
       </form>
       </center>
-		    <div class="input-group input-group-lg" id="messageSendDiv">
+        <div class="input-group input-group-lg" id="messageSendDiv">
           <form role="form" id="sendmsg" method="post"> 
           <div class="form-group">
           <input type="text" id="msg" class="form-control" placeholder="Message">&nbsp
-		 	      <!-- <input type="submit" style="height:45px;width:70px;" value="send" id="sendmsgbttn"></input> -->
+            <!-- <input type="submit" style="height:45px;width:70px;" value="send" id="sendmsgbttn"></input> -->
              <button type="button" class="btn btn-success" id="sendmsgbttn">Send Message</button>
             <button type="button" class="btn btn-danger" id="endbttn">End Conversation</button>
            <!-- <input type="submit" style="height:45px;width:70px;" value="end conversation" id="endbttn"></input> -->
           </div>
      </form> 
-      <div><a href="" id="closeChatWindow"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Hide Window</a></div><table><tr><td>
-   <video id='v' width="320" height="180" autoplay></video> </div></td><td><div> <video id='v2' width="320" height="180" autoplay></video></div></td></tr></table>
+      <div><a href="" id="closeChatWindow"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Hide Window</a></div>
+ <div id="mediaFrames">
+ </div>
+ </div></td></tr></table>
    </div>
    <div id="stat"></div>
 </div>
@@ -123,14 +123,14 @@
      margin-right: 30%;
 }
 #chatwindow {
-	display: none;
-	position: relative;
+  display: none;
+  position: relative;
     resize: both;
-	margin-left: 300;
+  margin-left: 300;
   margin-right: 300;
   bottom: 210px;
   height: 400px;
-	z-index: 1;
+  z-index: 1;
 }
 #error {
   display: none;
@@ -151,12 +151,12 @@
   display:inline
   }
 </style>
-<script src="/onCampus2/peer.js"></script>
+<script src="/peer.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js">
   </script>
   <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false&key=AIzaSyAd_qUj056TQ8botUBBwAoRY8Mm5z4O8Lk&libraries=places"></script>
 <script type="text/javascript" src="http://www.google.com/jsapi"></script>
-<script src="http://localhost:8080/socket.io/socket.io.js"></script>
+<script src="/socket.io/socket.io.js"></script>
 <script>
 $(document).ready(function(){
   console.log("script path : " + $(location).attr('pathname'));
@@ -164,13 +164,13 @@ $(document).ready(function(){
   var peer;
   var global_call_var = null;
   var localMediaStream = null;
-	var allMarkers = [];
-	var $form    = $('#adduser');
+  var allMarkers = [];
+  var $form    = $('#adduser');
   var $accReq = $('#accReq');
   var $decReq = $('#decReq');
-	var $username = $('#UserNameRegister');
+  var $username = $('#UserNameRegister');
   var $registerBttn = $('#registerBttn');
-	var $registerwell = $('#registerwell');
+  var $registerwell = $('#registerwell');
   var $sendReq = $('#bttn');
   var $wait = $('#waiting');
   var $sendmsg = $('#sendmsg');
@@ -179,7 +179,7 @@ $(document).ready(function(){
   var $msgbox = $('#msg');
   var $CWbttn = $('#closeChatWindow');
   var $OWbttn = $('#openChatWindow');
-	var socket  = io.connect('http://localhost:8080');
+  var socket  = io.connect();
   var data_one;
   var data_two;
   var lat;
@@ -205,7 +205,7 @@ $(document).ready(function(){
            $('#error').show();
         });
   if (navigator.geolocation){
-  	geolocate();
+    geolocate();
     navigator.geolocation.getCurrentPosition(showPosition);
     window.onload = mpld();
     function mpld(){
@@ -287,7 +287,8 @@ socket.on("send-users", function(dataArr){
   });
     socket.on("convEnded", function(isin, beingrq, cp){
     $('#chatwindow').hide();
-       $('#messages').empty();
+      $("#mediaFrames").empty();
+        $('#messages').empty();
            $('#stat').empty();
 
     if((global_call_var && localMediaStream) != '' || undefined || null){
@@ -311,6 +312,7 @@ socket.on("send-users", function(dataArr){
     $wait.hide();
     $('#allRequests').hide();
     $('#stat').html(data1 + " is now talking to " + data2);
+    $('#mediaFrames').html("  <table><tr><td><video id='v' width='320' height='180' autoplay></video></td><td><video id='v2' width='320' height='180' autoplay></video></td></tr></table>")
       navigator.getUserMedia({audio: false, video: true}, function(stream){
         // Set your video displays
         $('#v').prop('src', URL.createObjectURL(stream));
@@ -486,8 +488,7 @@ socket.on("send-users", function(dataArr){
           } else { 
           console.log("uname" + uname);
           if(uname == undefined){
-            $('#error').show();
-            errFlag = true;
+            showChatWindow(uname);
           } else {
           socket.emit("check_status", title, uname);
           socket.on("return_status", function(status){
@@ -526,13 +527,13 @@ socket.on("send-users", function(dataArr){
             }
           }
           socket.on("remove-marker", function(data){
-          	console.log(data);
-          	for(var x=0; x<allMarkers.length; x++){
-          		if(allMarkers[x].title == data){
+            console.log(data);
+            for(var x=0; x<allMarkers.length; x++){
+              if(allMarkers[x].title == data){
                 var temp = allMarkers[x].title;
-          			allMarkers[x].setMap(null);
-          		}
-          	}
+                allMarkers[x].setMap(null);
+              }
+            }
                 console.log("Marker remove request recieved");
           });
                 socket.on("update-map", function(dataArr){
@@ -540,7 +541,7 @@ socket.on("send-users", function(dataArr){
                            allMarkers[x].setMap(null);
                        }
                   allMarkers = [];
-    		  	for(var i=0; i < dataArr.length; i++){
+            for(var i=0; i < dataArr.length; i++){
                 if(allMarkers.indexOf(dataArr[i].username) == -1){} else {
                   allMarkers.splice(indexOf(dataArr[i].username), 1);
                 }
@@ -561,13 +562,13 @@ socket.on("send-users", function(dataArr){
                    }
              }
         }
-    				if(dataArr[i].username == uname){
+            if(dataArr[i].username == uname){
             } else {
-	    			var ltlng = new google.maps.LatLng(dataArr[i].lat,dataArr[i].longi);
+            var ltlng = new google.maps.LatLng(dataArr[i].lat,dataArr[i].longi);
             var marker = createmarker(ltlng, dataArr[i].username);
             allMarkers.push(marker);
-	    	    }
-    	 }
+            }
+       }
        console.log("listing markers array from map update ");
        for(var i=0; i < allMarkers.length; i++){
           console.log("Marker : " + i + " " + allMarkers[i].title);

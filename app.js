@@ -4,10 +4,11 @@ var fs = require('fs');
 var path = require('path');
 var url = require('url');
 var http = require('http');
+var port = 8080;
 
 
-server.listen(8080);
-console.log("server started");
+server.listen(port);
+console.log("server started on port : " + port);
   function init(request, response){
   fs.readFile(__dirname + '/index.html',
     function(err, data){

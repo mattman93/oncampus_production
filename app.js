@@ -7,7 +7,7 @@ var http = require('http');
 var port = 8080;
 
 
-server.listen(port);
+server.listen(port, "45.55.159.108");
 console.log("server started on port : " + port);
   function init(request, response){
   fs.readFile(__dirname + '/index.html',

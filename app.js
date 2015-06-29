@@ -1,15 +1,5 @@
-var server = require('http').createServer();
-var io = require('socket.io').listen(server);
-var fs = require('fs');
-var path = require('path');
-var url = require('url');
-var http = require('http');
-var port = 8080;
-
-
-server.listen(port, "45.55.159.108");
-console.log("server started on port : " + port);
-  function init(request, response){
+var server = require('http').createServer(
+   function init(request, response){
   fs.readFile(__dirname + '/index.html',
     function(err, data){
       if(err){
@@ -20,7 +10,12 @@ console.log("server started on port : " + port);
       response.end(data);
     }
   });
-  }
+  }).listen(80, "45.55.159.108");
+var io = require('socket.io').listen(server);
+var fs = require('fs');
+var path = require('path');
+var url = require('url');
+var http = require('http');
 
   var users = [];
   var userData = [];
@@ -56,9 +51,9 @@ function mod_loc(dataArr){
            dataArr[i].lat = parseFloat(dataArr[i].lat) + 0.0007165;
            dataArr[i].longi = parseFloat(dataArr[i].longi) + 0.0009165;
          }
-   }
- }
-}
+      }
+    }
+  }
 }
 socket.on("check-in", function(username, lat, longi){
       	var user = {

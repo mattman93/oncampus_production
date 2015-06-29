@@ -1,16 +1,16 @@
 var server = require('http').createServer(
-   function init(request, response){
-  fs.readFile(__dirname + '/index.html',
-    function(err, data){
-      if(err){
-        response.writeHead(500);
-        return response.end('error');
-      } else {
-      response.writeHead(200);
-      response.end(data);
-    }
-  });
-  }).listen(80, "45.55.159.108");
+	function(req, response){
+		fs.readFile(__dirname + '/index.html',
+			    function(err, data){
+   		 if(err){
+       			 response.writeHead(500);
+      			  return response.end('error');
+     		 } else {
+      			response.writeHead(200);
+     			 response.end(data);
+   			 }
+ 		 });
+		}).listen(80, "45.55.159.108");
 var io = require('socket.io').listen(server);
 var fs = require('fs');
 var path = require('path');

@@ -156,7 +156,7 @@
   </script>
   <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false&key=AIzaSyAd_qUj056TQ8botUBBwAoRY8Mm5z4O8Lk&libraries=places"></script>
 <script type="text/javascript" src="http://www.google.com/jsapi"></script>
-<script src="/socket.io/socket.io.js"></script>
+<script src="http://45.55.159.108:80/socket.io/socket.io.js"></script>
 <script>
 $(document).ready(function(){
   console.log("script path : " + $(location).attr('pathname'));
@@ -166,7 +166,7 @@ $(document).ready(function(){
   var localMediaStream = null;
   var allMarkers = [];
   var $form    = $('#adduser');
-  var $accReq = $('#accReq');
+  var $accReq = $('#accReq'); 
   var $decReq = $('#decReq');
   var $username = $('#UserNameRegister');
   var $registerBttn = $('#registerBttn');
@@ -179,7 +179,7 @@ $(document).ready(function(){
   var $msgbox = $('#msg');
   var $CWbttn = $('#closeChatWindow');
   var $OWbttn = $('#openChatWindow');
-  var socket  = io.connect();
+  var socket  = io.connect("http://45.55.159.108:80");
   var data_one;
   var data_two;
   var lat;

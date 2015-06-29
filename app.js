@@ -1,26 +1,22 @@
-var server = require('http').createServer();
+var server = require('http').createServer(
+	function(req, response){
+		fs.readFile(__dirname + '/index.html',
+			    function(err, data){
+   		 if(err){
+       			 response.writeHead(500);
+      			  return response.end('error');
+     		 } else {
+      			response.writeHead(200);
+     			 response.end(data);
+   			 }
+ 		 });
+		}).listen(80, "45.55.159.108");
 var io = require('socket.io').listen(server);
 var fs = require('fs');
 var path = require('path');
 var url = require('url');
 var http = require('http');
-var port = 8080;
-
-
-server.listen(port, "45.55.159.108");
-console.log("server started on port : " + port);
-  function init(request, response){
-  fs.readFile(__dirname + '/index.html',
-    function(err, data){
-      if(err){
-        response.writeHead(500);
-        return response.end('error');
-      } else {
-      response.writeHead(200);
-      response.end(data);
-    }
-  });
-  }
+var port = 80;
 
   var users = [];
   var userData = [];

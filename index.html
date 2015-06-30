@@ -552,16 +552,17 @@ socket.on("send-users", function(dataArr){
           });
 
   socket.on("update-map", function(dataArr){
-    if(dataArr.length > allMarkers.length){
-    for(var i=allMarkers.length; i < dataArr.length; i++){
-      if(dataArr[i].username == uname){} else {
-          var ltlng = new google.maps.LatLng(dataArr[i].lat, dataArr[i].longi);
-           var marker = createmarker(ltlng, dataArr[i].username);
+  var temp = $.merge(dataArr, allMarkers);
+  var newMarkers = $.unique(temp);
+
+    for(var i=0; i < newMarkers.length; i++){
+      if(newMarkers[i].username == uname){} else {
+          var ltlng = new google.maps.LatLng(newMarkers[i].lat, newMarkers[i].longi);
+           var marker = createmarker(ltlng, newMarkers[i].username);
             allMarkers.push(marker);
             allMarkerKeys.push(dataArr[i].username);
         }
     }
-  }
        console.log("listing markers array from map update ");
        for(var i=0; i < allMarkers.length; i++){
           console.log("Marker : " + i + " " + allMarkers[i].title);

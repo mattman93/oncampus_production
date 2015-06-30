@@ -77,7 +77,7 @@ socket.on("check-in", function(username, lat, longi){
              mod_loc(users);
              mod_loc(userData);
                   console.log("array len: " + users.length);
-                    socket.broadcast.emit("update-map", lat, longi, username);
+                    socket.broadcast.emit("update-map", userData);
                         });
 
 socket.on("chat-request", function(to, from){

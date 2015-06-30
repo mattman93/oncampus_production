@@ -549,12 +549,17 @@ socket.on("send-users", function(dataArr){
             console.log("Marker remove request recieved");
           });
 
-  socket.on("update-map", function(lat, longi, username){
-            var ltlng = new google.maps.LatLng(lat, longi);
-            var marker = createmarker(ltlng, username);
+  socket.on("update-map", function(dataArr){
+    for(var i=0; i < dataArr.length; i++){
+      if($.inArray(dataArr[i].username, allMarkerKeys)){}
+        else{
+          var ltlng = new google.maps.LatLng(dataArr[i].lat, dataArr[i].longi);
+           var marker = createmarker(ltlng, dataArr[i].username);
             allMarkers.push(marker);
-            allMarkerKeys.push(username);
-      
+            allMarkerKeys.push(dataArr[i].username);
+        }
+
+    }
        console.log("listing markers array from map update ");
        for(var i=0; i < allMarkers.length; i++){
           console.log("Marker : " + i + " " + allMarkers[i].title);

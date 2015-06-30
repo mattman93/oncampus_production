@@ -545,10 +545,14 @@ socket.on("send-users", function(dataArr){
   socket.on("remove-marker", function(data){
             console.log(data);
             var index = $.inArray(data, allMarkerKeys);
+            console.log("remove marker data : " + data);
+            console.log("remove marker index : " + index);
+            if(index >= 0){
             allMarkers[index].setMap(null);
             allMarkers.splice(index, 1);
             allMarkerKeys.splice(index, 1);
             console.log("Marker remove request recieved");
+            }
           });
 
   socket.on("update-map", function(dataArr){

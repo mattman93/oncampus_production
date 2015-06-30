@@ -546,6 +546,8 @@ socket.on("send-users", function(dataArr){
             console.log(data);
             var index = $.inArray(data, allMarkerKeys);
             allMarkers[index].setMap(null);
+            allMarkers.splice(index, 1);
+            allMarkerKeys.splice(index, 1);
             console.log("Marker remove request recieved");
           });
 

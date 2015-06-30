@@ -544,6 +544,7 @@ socket.on("send-users", function(dataArr){
 
   socket.on("remove-marker", function(data){
             console.log(data);
+            console.log("remove marker allMarkers array " + allMarkers);
             var index = $.inArray(data, allMarkerKeys);
             console.log("remove marker data : " + data);
             console.log("remove marker index : " + index);

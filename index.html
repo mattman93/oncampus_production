@@ -551,7 +551,7 @@ socket.on("send-users", function(dataArr){
 
   socket.on("update-map", function(dataArr){
     for(var i=0; i < dataArr.length; i++){
-      if($.inArray(dataArr[i].username, allMarkerKeys)){}
+      if($.inArray(dataArr[i].username, allMarkerKeys) !== "-1"){}
         else{
           var ltlng = new google.maps.LatLng(dataArr[i].lat, dataArr[i].longi);
            var marker = createmarker(ltlng, dataArr[i].username);

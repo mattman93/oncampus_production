@@ -17,15 +17,16 @@ var path = require('path');
 var url = require('url');
 var http = require('http');
 
-  var users = [];
+ var users = [];
   var userData = [];
 
    io.sockets.on('connection', function(socket){
 
-   	  socket.on("map-loaded", function(lat, longi){
+      socket.on("map-loaded", function(){
+        console.log("client " + socket.id + " map loaded ");
 
-    	 socket.emit("send-users", userData);
-   	});
+       socket.emit("send-users", userData);
+    });
 function makeid()
 {
     var text = "";
@@ -51,20 +52,20 @@ function mod_loc(dataArr){
            dataArr[i].lat = parseFloat(dataArr[i].lat) + 0.0007165;
            dataArr[i].longi = parseFloat(dataArr[i].longi) + 0.0009165;
          }
+        }
       }
     }
-  }
 }
 socket.on("check-in", function(username, lat, longi){
-      	var user = {
-         		lat: lat,
-         		longi: longi,
-         		username: username,
+        var user = {
+            lat: lat,
+            longi: longi,
+            username: username,
              beingRequested : false,
              isinconv : false,
              chatPartner : null,
-         	}
-          	var id = makeid();
+          }
+            var id = makeid();
              socket.user = id
              socket.username = username;
              users[socket.username] = socket;
@@ -75,9 +76,10 @@ socket.on("check-in", function(username, lat, longi){
              userData.push(user);
              mod_loc(users);
              mod_loc(userData);
-               		console.log("array len: " + users.length);
-               		  socket.broadcast.emit("update-map", userData);
+                  console.log("array len: " + users.length);
+                    socket.broadcast.emit("update-map", lat, longi, username);
                         });
+
 socket.on("chat-request", function(to, from){
           console.log('##### request received on server #####');
           var emitTarget = users.indexOf(to);
@@ -88,6 +90,8 @@ socket.on("chat-request", function(to, from){
           var selfTargetName = users[selfTarget];
           users[selfTargetName].beingRequested = true;
           users[TargetName].beingRequested = true;
+          users[from].chatPartner = to;
+          users[to].chatPartner = from;
           console.log("users[TargetName]" + users[TargetName].beingRequested);
           console.log("users[selfTargetName] " + users[selfTargetName].beingRequested);
               users[TargetName].emit("show-client-req", to, from);
@@ -127,9 +131,6 @@ socket.on("accept", function(from, to){
     }
         });
 socket.on("decline", function(from, uname){
-     //   var emitTarget = users.indexOf(from);
-       // var TargetName = users[emitTarget];
-        //socket.emit("dec", )
         console.log("from : " + from);
         console.log("uname : " + uname);
           users[uname].beingRequested = false;
@@ -139,6 +140,10 @@ socket.on("decline", function(from, uname){
 
 socket.on("check_status", function(data, me){
       var msg;
+      if(users[me].isinconv){
+        msg = 3;
+        users[me].emit("return_status", msg);
+      } else {
       console.log("--------------------");
       console.log("data : " + data);
       console.log("me : " + me);
@@ -154,26 +159,53 @@ socket.on("check_status", function(data, me){
              msg = 2;
               users[me].emit("return_status", msg);
       }
+    }
       console.log("msg : " + msg);
+
 });
     socket.on("message", function(you, message){
       var TargetName = users[you];
       var TN2 = users[you].chatPartner;
-      users[you].emit("sendmsg", message);
-      users[TN2].emit("sendmsg", message);
+      users[you].emit("sendmsg", message, you);
+      users[TN2].emit("sendmsg", message, you);
       });
 
+socket.on("end", function(uname){
 
+  if(uname == undefined){} else {
+                  if(users[uname].isinconv && users[uname].chatPartner != null){
+                    var otherUser = users[uname].chatPartner;
+                    users[otherUser].isinconv = false;
+                    users[otherUser].beingRequested = false;
+                    users[otherUser].chatPartner = null;
+                    users[uname].isinconv = false;
+                    users[uname].beingRequested = false;
+                    users[uname].chatPartner = null;
+                    users[otherUser].emit("convEnded", users[otherUser].isinconv,users[otherUser].beingRequested,users[otherUser].chatPartner);
+                  }
+      }
+        });
 socket.on('disconnect', function(){
   //check if was in conversation or sending/pending a request
   // if so then send
-     		var uname = socket.username;
-     		if(uname == undefined){} else {
-         		for(var x=0; x<users.length; x++){
-                		if(users[x]== uname){
-                			indx = x;
-                		}
-                	}
+        var uname = socket.username;
+        if(uname == undefined){} else {
+            for(var x=0; x<users.length; x++){
+                    if(users[x]== uname){
+                      indx = x;
+                    }
+                  }
+                  //chatpartner isn't set weiner
+                   if(users[uname].beingRequested && users[uname].chatPartner != null)
+                   {
+                    console.log("user left");
+                    console.log("chat partner " + users[uname].chatPartner);
+                      var otherUser = users[uname].chatPartner;
+                       users[otherUser].isinconv = false;
+                        users[otherUser].beingRequested = false;
+                         users[otherUser].chatPartner = null;
+                          users[otherUser].emit("senderLeft");
+                   }
                   if(users[uname].isinconv && users[uname].chatPartner != null){
                     //hide modal of conversation partner and reset their status
                     var otherUser = users[uname].chatPartner;
@@ -190,13 +222,13 @@ socket.on('disconnect', function(){
                       console.log("-----------------------");
                     users[otherUser].emit("convEnded", users[otherUser].isinconv,users[otherUser].beingRequested,users[otherUser].chatPartner);
                   }
-        		users.splice(indx, 1);
+            users.splice(indx, 1);
             userData.splice(indx, 1);
-         		io.sockets.emit("remove-marker", uname);
-         		console.log("arr len : " + users.length);
+            io.sockets.emit("remove-marker", uname);
+            console.log("arr len : " + users.length);
             console.log("userData len : " + userData.length);
-     	}
-      	});
+      }
+        });
 
 
    }); //on connection

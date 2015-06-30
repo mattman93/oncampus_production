@@ -1,4 +1,4 @@
-<html>
+ <html>
  <body>
    <div id ="infowell" class="well well-lg">
     <center><div>
@@ -17,8 +17,6 @@
 
 <!-- Latest compiled and minified JavaScript -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-   <link href="css/bootstrap.min.css" rel="stylesheet">
-   <script src="js/bootstrap.min.js"></script>
 <br><br><br><br><br><br><br><br><br><br><br><br><br><center>
 <div id="allRequests"></div>
 <div id="incoming-request">
@@ -46,6 +44,8 @@
           </div>
          </div>
      </div>
+
+
 <div class="panel panel-primary" id="chatwindow">
       <br><center>
         <div id="messages"></div>
@@ -65,9 +65,10 @@
           </div>
      </form> 
       <div><a href="" id="closeChatWindow"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Hide Window</a></div>
- <div id="mediaFrames">
- </div>
- </div></td></tr></table>
+      <table><tr><td>
+    <div id="media_one"></div>
+      </td><td>
+    <div id="media_two"></div></td></tr></table>
    </div>
    <div id="stat"></div>
 </div>
@@ -173,8 +174,9 @@ $(document).ready(function(){
   var global_call_var = null;
   var localMediaStream = null;
   var allMarkers = [];
+  var allMarkerKeys = [];
   var $form    = $('#adduser');
-  var $accReq = $('#accReq'); 
+  var $accReq = $('#accReq');
   var $decReq = $('#decReq');
   var $username = $('#UserNameRegister');
   var $registerBttn = $('#registerBttn');
@@ -187,7 +189,7 @@ $(document).ready(function(){
   var $msgbox = $('#msg');
   var $CWbttn = $('#closeChatWindow');
   var $OWbttn = $('#openChatWindow');
-  var socket  = io.connect("http://45.55.159.108:80");
+  var socket  = io.connect('http://45.55.159.108:80');
   var data_one;
   var data_two;
   var lat;
@@ -233,6 +235,8 @@ socket.on("send-users", function(dataArr){
           var ltlng = new google.maps.LatLng(dataArr[i].lat,dataArr[i].longi);
            var marker = createmarker(ltlng, dataArr[i].username);
            allMarkers.push(marker);
+           allMarkerKeys.push(dataArr[i].username);
+           console.log("allMarkerKeys : " + allMarkerKeys);
           }
         }
       } else {
@@ -295,10 +299,10 @@ socket.on("send-users", function(dataArr){
   });
     socket.on("convEnded", function(isin, beingrq, cp){
     $('#chatwindow').hide();
-      $("#mediaFrames").empty();
-        $('#messages').empty();
-           $('#stat').empty();
-
+       $('#messages').empty();
+          $('#stat').empty();
+            $('#media_one').empty();
+              $('#media_two').empty();
     if((global_call_var && localMediaStream) != '' || undefined || null){
       global_call_var.close();
       localMediaStream.stop();
@@ -320,7 +324,8 @@ socket.on("send-users", function(dataArr){
     $wait.hide();
     $('#allRequests').hide();
     $('#stat').html(data1 + " is now talking to " + data2);
-    $('#mediaFrames').html("  <table><tr><td><video id='v' width='320' height='180' autoplay></video></td><td><video id='v2' width='320' height='180' autoplay></video></td></tr></table>")
+    $('#media_one').html('<video id="v" width="320" height="180" autoplay></video>');
+    $('#media_two').html('<video id="v2" width="320" height="180" autoplay></video>');
       navigator.getUserMedia({audio: false, video: true}, function(stream){
         // Set your video displays
         $('#v').prop('src', URL.createObjectURL(stream));
@@ -496,7 +501,9 @@ socket.on("send-users", function(dataArr){
           } else { 
           console.log("uname" + uname);
           if(uname == undefined){
-            showChatWindow(uname);
+            $('#error').html("<b> you must make a username first </b>");
+            $('#error').show();
+            errFlag = true;
           } else {
           socket.emit("check_status", title, uname);
           socket.on("return_status", function(status){
@@ -534,53 +541,27 @@ socket.on("send-users", function(dataArr){
               });
             }
           }
-          socket.on("remove-marker", function(data){
+
+  socket.on("remove-marker", function(data){
             console.log(data);
-            for(var x=0; x<allMarkers.length; x++){
-              if(allMarkers[x].title == data){
-                var temp = allMarkers[x].title;
-                allMarkers[x].setMap(null);
-              }
-            }
-                console.log("Marker remove request recieved");
+            var index = $.inArray(data, allMarkerKeys);
+            allMarkers[index].setMap(null);
+            console.log("Marker remove request recieved");
           });
-                socket.on("update-map", function(dataArr){
-                  for(var x=0; x<allMarkers.length; x++){
-                           allMarkers[x].setMap(null);
-                       }
-                  allMarkers = [];
-            for(var i=0; i < dataArr.length; i++){
-                if(allMarkers.indexOf(dataArr[i].username) == -1){} else {
-                  allMarkers.splice(indexOf(dataArr[i].username), 1);
-                }
-         if(dataArr.length > 1){
-              if(i == dataArr.length-1){
-                 if((dataArr[i].lat ||  dataArr[i].longi)==(dataArr[i-1].lat ||  dataArr[i-1].longi)){
-                    // This is concatenating 0.0003112 onto end of string - parse to int
-                  dataArr[i].lat = parseFloat(dataArr[i].lat) + 0.0006165;
-                  dataArr[i].longi = parseFloat(dataArr[i].longi) + 0.0004165;
-                  console.log("After location Modification  " + dataArr[i].lat);
-                }
-              } else {
-                if((dataArr[i].lat ||  dataArr[i].longi)==(dataArr[i+1].lat ||  dataArr[i+1].longi)){
-                        // This is concatenating 0.0003112 onto end of string - parse to int
-                  dataArr[i].lat = parseFloat(dataArr[i].lat) + 0.0004165;
-                  dataArr[i].longi = parseFloat(dataArr[i].longi) + 0.0006165;
-                  console.log("After location Modification  " + dataArr[i].lat);
-                   }
-             }
-        }
-            if(dataArr[i].username == uname){
-            } else {
-            var ltlng = new google.maps.LatLng(dataArr[i].lat,dataArr[i].longi);
-            var marker = createmarker(ltlng, dataArr[i].username);
+
+  socket.on("update-map", function(lat, longi, username){
+            var ltlng = new google.maps.LatLng(lat, longi);
+            var marker = createmarker(ltlng, username);
             allMarkers.push(marker);
-            }
-       }
+            allMarkerKeys.push(username);
+      
        console.log("listing markers array from map update ");
        for(var i=0; i < allMarkers.length; i++){
           console.log("Marker : " + i + " " + allMarkers[i].title);
                 }
           });
+
+
+ // close document.ready 
     });
 </script>

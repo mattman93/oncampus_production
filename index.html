@@ -557,7 +557,7 @@ socket.on("send-users", function(dataArr){
           });
 
   socket.on("update-map", function(dataArr){
-  allMarkers.length = 0;
+  allMarkers = [];
     for(var i=0; i < dataArr.length; i++){
       if(dataArr[i].username == uname){} else {
           var ltlng = new google.maps.LatLng(dataArr[i].lat, dataArr[i].longi);

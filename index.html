@@ -542,13 +542,8 @@ socket.on("send-users", function(dataArr){
             }
           }
 
-  socket.on("remove-marker", function(data){
-            console.log(data);
-            console.log("remove marker allMarkers array " + allMarkers);
-            var index = $.inArray(data, allMarkerKeys);
-            console.log("remove marker data : " + data);
-            console.log("remove marker index : " + index);
-            console.log(allMarkers[index]);
+  socket.on("remove-marker", function(data){ 
+            var index = allMarkerKeys.indexOf(data);
             if(index >= 0){
             allMarkers[index].setMap(null);
             allMarkers.splice(index, 1);

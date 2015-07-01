@@ -235,7 +235,7 @@ socket.on("send-users", function(dataArr){
           var ltlng = new google.maps.LatLng(dataArr[i].lat,dataArr[i].longi);
            var marker = createmarker(ltlng, dataArr[i].username);
            allMarkers.push(marker);
-           allMarkerKeys.push(dataArr[i].username);
+           //allMarkerKeys.push(dataArr[i].username);
            console.log("allMarkerKeys : " + allMarkerKeys);
           }
         }
@@ -541,39 +541,53 @@ socket.on("send-users", function(dataArr){
               });
             }
           }
-
-  socket.on("remove-marker", function(data){
-
-       for(var x=0; x<allMarkers.length; x++){
+ socket.on("remove-marker", function(data){
+            console.log(data);
+            for(var x=0; x<allMarkers.length; x++){
               if(allMarkers[x].title == data){
+                var temp = allMarkers[x].title;
                 allMarkers[x].setMap(null);
-                allMarkers[x].visible = false;
-                allMarkers.splice(x,1);
-                allMarkerKeys.splice(x,1);
               }
             }
                 console.log("Marker remove request recieved");
           });
-
-  socket.on("update-map", function(dataArr){
-  allMarkers = [];
-  allMarkerKeys = [];
-  allMarkers.length = 0;
-  allMarkerKeys.length = 0;
-    for(var i=0; i < dataArr.length; i++){
-      if(dataArr[i].username == uname){} else {
-          var ltlng = new google.maps.LatLng(dataArr[i].lat, dataArr[i].longi);
-           var marker = createmarker(ltlng, dataArr[i].username);
-            allMarkers.push(marker);
-            allMarkerKeys.push(dataArr[i].username);
+                socket.on("update-map", function(dataArr){
+                  for(var x=0; x<allMarkers.length; x++){
+                           allMarkers[x].setMap(null);
+                       }
+                  allMarkers = [];
+            for(var i=0; i < dataArr.length; i++){
+                if(allMarkers.indexOf(dataArr[i].username) == -1){} else {
+                  allMarkers.splice(indexOf(dataArr[i].username), 1);
+                }
+         if(dataArr.length > 1){
+              if(i == dataArr.length-1){
+                 if((dataArr[i].lat ||  dataArr[i].longi)==(dataArr[i-1].lat ||  dataArr[i-1].longi)){
+                    // This is concatenating 0.0003112 onto end of string - parse to int
+                  dataArr[i].lat = parseFloat(dataArr[i].lat) + 0.0006165;
+                  dataArr[i].longi = parseFloat(dataArr[i].longi) + 0.0004165;
+                  console.log("After location Modification  " + dataArr[i].lat);
+                }
+              } else {
+                if((dataArr[i].lat ||  dataArr[i].longi)==(dataArr[i+1].lat ||  dataArr[i+1].longi)){
+                        // This is concatenating 0.0003112 onto end of string - parse to int
+                  dataArr[i].lat = parseFloat(dataArr[i].lat) + 0.0004165;
+                  dataArr[i].longi = parseFloat(dataArr[i].longi) + 0.0006165;
+                  console.log("After location Modification  " + dataArr[i].lat);
+                   }
+             }
         }
-    } 
-       console.log("listing markers array from map update");
+            if(dataArr[i].username == uname){
+            } else {
+            var ltlng = new google.maps.LatLng(dataArr[i].lat,dataArr[i].longi);
+            var marker = createmarker(ltlng, dataArr[i].username);
+            allMarkers.push(marker);
+            }
+       }
+       console.log("listing markers array from map update ");
        for(var i=0; i < allMarkers.length; i++){
           console.log("Marker : " + i + " " + allMarkers[i].title);
                 }
-                console.log("allMarkers.length : " + allMarkers.length);
-                console.log("allMarkerKeys.length : " + allMarkerKeys.length);
           });
  // close document.ready 
     });

@@ -542,18 +542,24 @@ socket.on("send-users", function(dataArr){
             }
           }
 
-  socket.on("remove-marker", function(data){ 
-            var index = allMarkerKeys.indexOf(data);
-            if(index >= 0){
-            allMarkers[index].setMap(null);
-            allMarkers.splice(index, 1);
-            allMarkerKeys.splice(index, 1);
-            console.log("Marker remove request recieved");
+  socket.on("remove-marker", function(data){
+
+       for(var x=0; x<allMarkers.length; x++){
+              if(allMarkers[x].title == data){
+                allMarkers[x].setMap(null);
+                allMarkers[x].visible = false;
+                allMarkers.splice(x,1);
+                allMarkerKeys.splice(x,1);
+              }
             }
+                console.log("Marker remove request recieved");
           });
 
   socket.on("update-map", function(dataArr){
   allMarkers = [];
+  allMarkerKeys = [];
+  allMarkers.length = 0;
+  allMarkerKeys.length = 0;
     for(var i=0; i < dataArr.length; i++){
       if(dataArr[i].username == uname){} else {
           var ltlng = new google.maps.LatLng(dataArr[i].lat, dataArr[i].longi);
@@ -561,11 +567,13 @@ socket.on("send-users", function(dataArr){
             allMarkers.push(marker);
             allMarkerKeys.push(dataArr[i].username);
         }
-    }
-       console.log("listing markers array from map update ");
+    } 
+       console.log("listing markers array from map update");
        for(var i=0; i < allMarkers.length; i++){
           console.log("Marker : " + i + " " + allMarkers[i].title);
                 }
+                console.log("allMarkers.length : " + allMarkers.length);
+                console.log("allMarkerKeys.length : " + allMarkerKeys.length);
           });
  // close document.ready 
     });

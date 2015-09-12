@@ -9,14 +9,8 @@
      </center>
  </div>
    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-   <!-- Latest compiled and minified CSS -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-
-<!-- Optional theme -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
-
-<!-- Latest compiled and minified JavaScript -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+   <link href="css/bootstrap.min.css" rel="stylesheet">
+   <script src="js/bootstrap.min.js"></script>
 <br><br><br><br><br><br><br><br><br><br><br><br><br><center>
 <div id="allRequests"></div>
 <div id="incoming-request">
@@ -30,7 +24,7 @@
          </form>
   </div>
 </div>
-<div id="error"></div>
+<div id="error" style="background-color: #FE2E2E;"></div>
   <div id="contactform">
     <div class="col-sm-4">
           <div id ="registerwell" class="well well-lg">
@@ -38,7 +32,7 @@
               <form role="form" id="adduser" method="POST">
               <div class="form-group">
                 <label for="UserNameRegister">Username</label>
-                <input type="text" name = "registerusername" class="form-control" id="UserNameRegister" placeholder="Register Username">
+                <input type="text" maxlength="15" name = "registerusername" class="form-control" id="UserNameRegister" placeholder="Register Username">
                  <input type="submit" style="height:35px; width:65px" value="register" id="registerBttn"></input>
               </div>
           </div>
@@ -57,7 +51,7 @@
         <div class="input-group input-group-lg" id="messageSendDiv">
           <form role="form" id="sendmsg" method="post"> 
           <div class="form-group">
-          <input type="text" id="msg" class="form-control" placeholder="Message">&nbsp
+          <input type="text" maxlength="155" id="msg" class="form-control" placeholder="Message">&nbsp
             <!-- <input type="submit" style="height:45px;width:70px;" value="send" id="sendmsgbttn"></input> -->
              <button type="button" class="btn btn-success" id="sendmsgbttn">Send Message</button>
             <button type="button" class="btn btn-danger" id="endbttn">End Conversation</button>
@@ -119,7 +113,7 @@
    z-index: 1; /* The z-index should be higher than Google Maps */
    opacity: .85; /* Set the opacity for a slightly transparent Google Form */
    width: 350;
-  position: relative;
+  position: absolute;
   margin-left: 20%;
   margin-right: 80%;
 }
@@ -127,13 +121,13 @@
   display: none;
    z-index: 1; /* The z-index should be higher than Google Maps */
    opacity: .85; /* Set the opacity for a slightly transparent Google Form */
-    position: relative;
+    position: absolute;
     margin-left: 30%;
      margin-right: 30%;
 }
 #chatwindow {
   display: none;
-  position: relative;
+  position: absolute;
     resize: both;
   margin-left: 300;
   margin-right: 300;
@@ -144,11 +138,14 @@
 #error {
   display: none;
   position: relative;
+    margin-left: 550;
+  margin-right: 680;
+  opacity: .85;
   z-index: 1;
 }
 #recReq {
   display: none;
-   position: relative;
+   position: absolute;
    margin-left: -45%;
   margin-right: -45%;
   z-index: 1;
@@ -212,7 +209,7 @@ $(document).ready(function(){
       function (error) { 
           if (error.code == error.PERMISSION_DENIED)
            console.log("location blocked");
-           $('#error').html("<b>You must enable your browsers geolocation</b>");
+           $('#error').html("<b><font color='white'>You must enable your browsers geolocation</font></b>");
            $('#error').show();
         });
   if (navigator.geolocation){
@@ -236,7 +233,7 @@ socket.on("send-users", function(dataArr){
           var ltlng = new google.maps.LatLng(dataArr[i].lat,dataArr[i].longi);
            var marker = createmarker(ltlng, dataArr[i].username);
            allMarkers.push(marker);
-           //allMarkerKeys.push(dataArr[i].username);
+           allMarkerKeys.push(dataArr[i].username);
            console.log("allMarkerKeys : " + allMarkerKeys);
           }
         }
@@ -304,10 +301,13 @@ socket.on("send-users", function(dataArr){
           $('#stat').empty();
             $('#media_one').empty();
               $('#media_two').empty();
-    if((global_call_var && localMediaStream) != '' || undefined || null){
+    if((global_call_var != null)){
       global_call_var.close();
+    }
+    if(localMediaStream != null){
       localMediaStream.stop();
     }
+    
 
     console.log(isin);
     console.log(beingrq);
@@ -344,57 +344,15 @@ socket.on("send-users", function(dataArr){
             peer.on('call', function(call){
               global_call_var = call;
                call.answer(window.localStream); // Answer the call with an A/V stream.
-                if (window.existingCall) {
-                   window.existingCall.close();
-                    }
+              //  if (window.existingCall) {
+              //     window.existingCall.close();
+              //      }
                call.on('stream', function(stream) {
                    $('#v2').prop('src', URL.createObjectURL(stream));
                     });
               });
 
   });
-  function handleCall(call){
-                    // Wait for stream on the call, then set peer video display
-                    call.on('stream', function(stream){
-                      $('#v2').prop('src', URL.createObjectURL(stream));
-                    });
-                  window.existingCall = call;
-                 }
-   function video(){
-   navigator.getUserMedia = (navigator.getUserMedia || 
-                             navigator.webkitGetUserMedia || 
-                             navigator.mozGetUserMedia || 
-                             navigator.msGetUserMedia);
-
-      navigator.getUserMedia({video: true, audio: false}, function(stream) {
-        console.log("peer identifier " +identifier);
-        var call = peer.call(identifier, stream);
-        call.on('stream', function(remoteStream) {
-            var v = document.getElementById('v');
-                  var url = window.URL || window.webkitURL;
-                    v.src = url ? url.createObjectURL(remoteStream) : remoteStream;
-                     v.play();
-                      });
-                  }, function(err) {
-            console.log('Failed to get local stream' ,err);
-              });
-
-    peer.on('call', function(call) {
-      navigator.getUserMedia({video: true, audio: false}, function(stream) {
-                 call.answer(stream); // Answer the call with an A/V stream.
-                    call.on('stream', function(remoteStream) {
-                        var v2 = document.getElementById('v2');
-                         var url = window.URL || window.webkitURL;
-                         v2.src = url ? url.createObjectURL(remoteStream) : remoteStream;
-                          v2.play();
-                       
-          // Show stream in some video/canvas element.
-                         });
-                    }, function(err) {
-                   console.log('Failed to get local stream' ,err);
-                    });
-              });
- }
   $decReq.submit(function(event){
     event.preventDefault();
       $('#allRequests').hide();
@@ -426,37 +384,39 @@ socket.on("send-users", function(dataArr){
   socket.on("dec", function(data){
    });
   $form.submit(function(event){
-   var valid = false;
     event.preventDefault();
        if($username.val() == '' || null || undefined){
-          $('#error').html("<b> must enter a user name </b>");
+          $('#error').html("<b><font color='white'> must enter a user name </font></b>");
              $('#error').show();
-        valid = true;
     } else {
     uname = $username.val();
       if(errFlag){
           $('#error').hide();
       }
     socket.emit("check-in", $username.val(), lat, longi);
-      $form.hide();
+    socket.on("valid", function(message){
+       $form.hide();
         $('#error').hide();
           $registerwell.hide();
             peer = new Peer($username.val(), {key: 'j7c1qbwja038r529'});
               console.log("peer : " + peer.id);
               global_user = peer.id;
-       }
-    if(!valid){
-        var latlng = new google.maps.LatLng(lat,longi); 
-          var marker = new google.maps.Marker({ 
-            position: latlng, 
-            map: map, 
-            flat: true, 
-            title: "Me : " + uname, 
-            draggable: false 
-         });
+              var latlng = new google.maps.LatLng(lat,longi); 
+               var marker = new google.maps.Marker({ 
+                position: latlng, 
+                map: map, 
+                flat: true, 
+                title: "Me : " + uname, 
+                draggable: false 
+             });
          iconFile = 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'; 
         marker.setIcon(iconFile);
-      }
+    });
+    socket.on("register_error", function(err){
+      $('#error').html("<b><font color='white'>" + err + "</font></b>");
+       $('#error').show();
+    });
+       }
   });
   function showPosition(position){
        lat = position.coords.latitude.toString().substr(0,8);
@@ -476,7 +436,7 @@ socket.on("send-users", function(dataArr){
   }
   function showChatWindow(title){
             if(uname == undefined){
-               $('#error').html("<b> Make a user name to send a chat request</b>")
+               $('#error').html("<b><font color='white'> Make a user name to send a chat request</font></b>")
                 $('#error').show();
                  errFlag = true;
                    } else {
@@ -506,7 +466,7 @@ socket.on("send-users", function(dataArr){
           } else { 
           console.log("uname" + uname);
           if(uname == undefined){
-            $('#error').html("<b> you must make a username first </b>");
+            $('#error').html("<b><font color='white'> you must make a username first </font></b>");
             $('#error').show();
             errFlag = true;
           } else {
@@ -546,7 +506,8 @@ socket.on("send-users", function(dataArr){
               });
             }
           }
- socket.on("remove-marker", function(data){
+
+   socket.on("remove-marker", function(data){
             console.log(data);
             for(var x=0; x<allMarkers.length; x++){
               if(allMarkers[x].title == data){

@@ -57,6 +57,10 @@ function mod_loc(dataArr){
     }
 }
 socket.on("check-in", function(username, lat, longi){
+  if(users.indexOf(username) > -1){
+    var msg = "there is already a user by that name";
+    socket.emit("register_error", msg);
+  } else {
         var user = {
             lat: lat,
             longi: longi,
@@ -64,7 +68,7 @@ socket.on("check-in", function(username, lat, longi){
              beingRequested : false,
              isinconv : false,
              chatPartner : null,
-          }
+          } 
             var id = makeid();
              socket.user = id
              socket.username = username;
@@ -77,7 +81,10 @@ socket.on("check-in", function(username, lat, longi){
              mod_loc(users);
              mod_loc(userData);
                   console.log("array len: " + users.length);
+                  var status = "user created";
+                  socket.emit("valid", status);
                     socket.broadcast.emit("update-map", userData);
+                  }
                         });
 
 socket.on("chat-request", function(to, from){

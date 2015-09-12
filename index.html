@@ -332,7 +332,7 @@ socket.on("send-users", function(dataArr){
     $wait.hide();
     $('#allRequests').hide();
     $('#stat').html(data1 + " is now talking to " + data2);
-  //  $('#media_one').html('<video id="v" width="320" height="180" autoplay></video>');
+    $('#media_one').html('<video id="v" width="320" height="180" autoplay></video>');
     $('#media_two').html('<video id="v2" width="320" height="180" autoplay></video>');
       navigator.getUserMedia({audio: false, video: true}, function(stream){
         // Set your video displays
@@ -355,6 +355,8 @@ socket.on("send-users", function(dataArr){
               //     window.existingCall.close();
               //      }
                call.on('stream', function(stream) {
+                 $("#media_two").empty();
+                 $('#media_two').html('<video id="v2" width="320" height="180" autoplay></video>');
                    $('#v2').prop('src', URL.createObjectURL(stream));
                     });
               });

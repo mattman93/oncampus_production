@@ -134,7 +134,7 @@
 }
 #chatwindow {
   display: none;
-  position: absolute;
+  position: relative;
     resize: both;
   margin-left: 300;
   margin-right: 300;
@@ -146,7 +146,7 @@
   display: none;
   position: relative;
     margin-left: 550;
-  margin-right: 600;
+  margin-right: 580;
   opacity: .85;
   z-index: 1;
 }
@@ -332,7 +332,7 @@ socket.on("send-users", function(dataArr){
     $wait.hide();
     $('#allRequests').hide();
     $('#stat').html(data1 + " is now talking to " + data2);
-    $('#media_one').html('<video id="v" width="320" height="180" autoplay></video>');
+  //  $('#media_one').html('<video id="v" width="320" height="180" autoplay></video>');
     $('#media_two').html('<video id="v2" width="320" height="180" autoplay></video>');
       navigator.getUserMedia({audio: false, video: true}, function(stream){
         // Set your video displays

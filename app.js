@@ -164,9 +164,7 @@ socket.on("check_status", function(data, me){
 
 });
     socket.on("message", function(you, message){
-      var TargetName = users[you];
       var TN2 = users[you].chatPartner;
-      users[you].emit("sendmsg", message, you);
       users[TN2].emit("sendmsg", message, you);
       });
 

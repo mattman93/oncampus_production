@@ -200,6 +200,7 @@ $(document).ready(function(){
   var errFlag = false;
   var global_to;
   var global_from;
+  var global_user;
   $msgbox.prop("disabled", true);
   $username.prop('disabled', true);
   $registerBttn.prop('disabled', true);
@@ -403,15 +404,17 @@ socket.on("send-users", function(dataArr){
     $('#waiting').hide();
       $('#stat').html(data + " has declined your request =(");
              });
-  $('#sendmsgbttn').click(function(event){
-    event.preventDefault();
-      socket.emit("message", data_one, $msg.val());
-            $msg.val("");
-                 });
   $sendmsg.submit(function(event){
     event.preventDefault();
-       socket.emit("message", data_one, $msg.val());
+      console.log("you : " + global_user);
+      $('#messages').append("<b>" + global_user + " : " +  $msg.val() + "</b><br>");
+       socket.emit("message", global_user, $msg.val());
           $msg.val("");
+                 });
+  socket.on("sendmsg", function(data, from){
+   console.log("from : " + from);
+         $('#messages').append("<b>" + from + " : " + data + "</b><br>");
+            updateScroll();
                  });
   socket.on("sendmsg", function(data, you){
     console.log("self : " + you);
@@ -439,6 +442,7 @@ socket.on("send-users", function(dataArr){
           $registerwell.hide();
             peer = new Peer($username.val(), {key: 'j7c1qbwja038r529'});
               console.log("peer : " + peer.id);
+              global_user = peer.id;
        }
     if(!valid){
         var latlng = new google.maps.LatLng(lat,longi); 

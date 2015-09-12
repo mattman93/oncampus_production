@@ -146,7 +146,7 @@
   display: none;
   position: relative;
     margin-left: 550;
-  margin-right: 680;
+  margin-right: 600;
   opacity: .85;
   z-index: 1;
 }
@@ -351,9 +351,9 @@ socket.on("send-users", function(dataArr){
             peer.on('call', function(call){
               global_call_var = call;
                call.answer(window.localStream); // Answer the call with an A/V stream.
-              //  if (window.existingCall) {
-              //     window.existingCall.close();
-              //      }
+                if (window.existingCall) {
+                   window.existingCall.close();
+                    }
                call.on('stream', function(stream) {
                    $('#v2').prop('src', URL.createObjectURL(stream));
                     });

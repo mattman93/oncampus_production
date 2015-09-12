@@ -404,6 +404,13 @@ socket.on("send-users", function(dataArr){
     $('#waiting').hide();
       $('#stat').html(data + " has declined your request =(");
              });
+   $('#sendmsgbttn').click(function(event){
+    event.preventDefault();
+    console.log("from : " + global_user);
+     $('#messages').append("<b>" + global_user + " : " +  $msg.val() + "</b><br>");
+      socket.emit("message", global_user, $msg.val());
+            $msg.val("");
+                 });
   $sendmsg.submit(function(event){
     event.preventDefault();
       console.log("you : " + global_user);
@@ -415,12 +422,6 @@ socket.on("send-users", function(dataArr){
    console.log("from : " + from);
          $('#messages').append("<b>" + from + " : " + data + "</b><br>");
             updateScroll();
-                 });
-  socket.on("sendmsg", function(data, you){
-    console.log("self : " + you);
-         $('#messages').append("<b>" + you + " : " + data + "</b><br>");
-            updateScroll();
-                 
                  });
   socket.on("dec", function(data){
    });

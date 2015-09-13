@@ -382,6 +382,7 @@ socket.on("send-users", function(dataArr){
     event.preventDefault();
       console.log("you : " + global_user);
       $('#messages').append("<b>" + global_user + " : " +  $msg.val() + "</b><br>");
+      updateScroll();
        socket.emit("message", global_user, $msg.val());
           $msg.val("");
                  });

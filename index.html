@@ -334,7 +334,7 @@ socket.on("send-users", function(dataArr){
     $('#stat').html(data1 + " is now talking to " + data2);
     $('#media_one').html('<video id="v" width="320" height="180" autoplay></video>');
    // $('#media_two').html('<video id="v2" width="320" height="180" autoplay></video>');
-      navigator.getUserMedia({audio: false, video: true}, function(stream){
+      navigator.getUserMedia({audio: true, video: true}, function(stream){
         // Set your video displays
         $('#v').prop('src', URL.createObjectURL(stream));
         localMediaStream = stream;

@@ -205,11 +205,11 @@ socket.on('disconnect', function(){
                    {
                     console.log("user left");
                     console.log("chat partner " + users[uname].chatPartner);
-                      var otherUser = users[uname].chatPartner;
-                       users[otherUser].isinconv = false;
+                  var otherUser = users[uname].chatPartner;
+                    users[otherUser].emit("senderLeft");
+                      users[otherUser].isinconv = false;
                         users[otherUser].beingRequested = false;
                          users[otherUser].chatPartner = null;
-                          users[otherUser].emit("senderLeft");
                    }
                   if(users[uname].isinconv && users[uname].chatPartner != null){
                     //hide modal of conversation partner and reset their status
@@ -217,14 +217,6 @@ socket.on('disconnect', function(){
                     users[otherUser].isinconv = false;
                     users[otherUser].beingRequested = false;
                     users[otherUser].chatPartner = null;
-                      console.log("-----------------------");
-                      console.log("-----------------------");
-                      console.log("you are  : " + otherUser);
-                      console.log("isinconv : " + users[otherUser].isinconv);
-                      console.log("beingRequested : " + users[otherUser].beingRequested);
-                      console.log("chatPartner : " + users[otherUser].chatPartner);
-                       console.log("-----------------------");
-                      console.log("-----------------------");
                     users[otherUser].emit("convEnded", users[otherUser].isinconv,users[otherUser].beingRequested,users[otherUser].chatPartner);
                   }
             users.splice(indx, 1);

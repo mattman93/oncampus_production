@@ -274,8 +274,12 @@ socket.on("send-users", function(dataArr){
 
   });
   socket.on("senderLeft", function(){
+      console.log("event");
+  $("#chatwindow").hide();
+    $('#messages').empty();
+           $('#stat').empty();
      $('#allRequests').hide();
-        $("#stat").html();
+        $("#stat").html("");
             $("#bttn").hide();
   });
   $accReq.submit(function(event){
@@ -359,8 +363,6 @@ socket.on("send-users", function(dataArr){
                    $('#v2').prop('src', URL.createObjectURL(stream));
                     });
               });
-
-
   });
   $decReq.submit(function(event){
     event.preventDefault();

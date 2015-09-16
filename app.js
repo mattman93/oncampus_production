@@ -103,6 +103,14 @@ socket.on("chat-request", function(to, from){
           console.log("users[selfTargetName] " + users[selfTargetName].beingRequested);
               users[TargetName].emit("show-client-req", to, from);
                         });
+socket.on("cancelRequest", function(to, from){
+          users[from].beingRequested = false;
+          users[to].beingRequested = false;
+          users[from].chatPartner = null;
+          users[to].chatPartner = null;
+              users[to].emit("senderLeft");
+               users[from].emit("senderLeft");
+});
 socket.on("accept", function(from, to){
         var emitTarget = users.indexOf(from);
         var TargetName = users[emitTarget];

@@ -64,6 +64,9 @@
             <button type="button" class="btn btn-danger" id="endbttn">End Conversation</button>
            <!-- <input type="submit" style="height:45px;width:70px;" value="end conversation" id="endbttn"></input> -->
           </div>
+          <div id="cancel_req">
+              <button type="button" class="btn btn-danger" id="cancelbttn">Cancel Request</button>
+          </div>
      </form> 
       <div><a href="" id="closeChatWindow"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Hide Window</a></div>
       <table><tr><td>
@@ -163,6 +166,9 @@
 #frm {
   display:inline
   }
+#cancel_req {
+  display: none;
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/0.3.14/peer.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js">
@@ -193,6 +199,8 @@ $(document).ready(function(){
   var $msgbox = $('#msg');
   var $CWbttn = $('#closeChatWindow');
   var $OWbttn = $('#openChatWindow');
+  var $cancel = $('#cancelbttn');
+  var $canceldiv = $('#cancel_req');
   var socket  = io.connect('http://45.55.159.108:80');
   var data_one;
   var data_two;
@@ -258,7 +266,12 @@ socket.on("send-users", function(dataArr){
     socket.emit("chat-request", identifier, uname);
     $sendReq.hide();
     $wait.show();
+    $canceldiv.show();
   });
+  $cancelbttn.click(function(event){
+    event.preventDefault();
+    socket.emit("cancelRequest",  identifier, uname);
+  })
   socket.on("show-client-req", function(to, from){
     global_to = to;
     global_from = from;

@@ -294,6 +294,8 @@ socket.on("send-users", function(dataArr){
      $('#allRequests').hide();
         $("#stat").html("");
             $("#bttn").hide();
+             $canceldiv.hide();
+             $wait.hide();
   });
   $accReq.submit(function(event){
     event.preventDefault();

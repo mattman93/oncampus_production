@@ -217,7 +217,7 @@ socket.on("end", function(uname){
         });
 socket.on("send_shout", function(from, msg){
   var post  = {sender: from, message: msg};
-    var query = connection.query('INSERT INTO messages SET ?', post, function(err, result) {
+    var query = connection.query('INSERT INTO messages ?', post, function(err, result) {
     });
   var key = from + ":" + makeid();
       //client.set(key, msg);

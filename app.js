@@ -16,7 +16,13 @@ var fs = require('fs');
 var path = require('path');
 var url = require('url');
 var http = require('http');
-
+var connect = require('connect');
+var redis = require('redis');
+var client = redis.createClient(6379, '45.55.159.108');
+var app = connect();
+client.on('connect', function(){
+  console.log("connected");
+});
  var users = [];
   var userData = [];
 
@@ -198,6 +204,26 @@ socket.on("end", function(uname){
                   }
       }
         });
+socket.on("send_shout", function(from, msg){
+  var key = from + ":" + makeid();
+      client.set(key, msg);
+      client.get(key, function(err, reply) {
+          io.sockets.emit("post_shout", from, reply);
+        });
+});
+
+socket.on("get_all_shouts", function(){
+  client.keys("*", function (err, all_keys) {  
+            for(var i=0; i<100; i++){   
+               post_key = all_keys[i]; 
+               client.get(post_key.toString(), function(err, msg){
+                var arr = post_key.split(':');
+                var from = arr[0];
+                socket.emit("load_shouts", from, msg); 
+               });
+              } 
+         });
+});
 socket.on('disconnect', function(){
   //check if was in conversation or sending/pending a request
   // if so then send

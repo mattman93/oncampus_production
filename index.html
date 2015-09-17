@@ -78,6 +78,24 @@
 </div>
  </center>
   <div id="map-canvas" style="width: 100%; height: 100%"></div>
+    <div id="shout_content" class="well well-lg">
+    <a href="" id="closeshout"> Hide <span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
+    <div id="shoutbox">
+      <div id="s_msgs"></div>
+     <div id="postshout">
+       </div>
+       <form id="sendshoutform">
+         <input type="text" maxlength="75" id="shouttextfield" style="width:215px;" placeholder="say something to the world" />
+         <button type="button" class="btn btn-success" id="sendshoutbttn">Send</button>
+       </form>
+       </div>
+    </div>
+      <div id="hiddenShoutWindow" class="well well-lg">
+        <div><a href="" id="openShoutWindow"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Show Messages</a></div>
+      </div>
+  <div id="hiddenChatWindow" class="well well-lg">
+<div><a href="" id="openChatWindow"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Show Window</a></div>
+</div>
   <div id="hiddenChatWindow" class="well well-lg">
 <div><a href="" id="openChatWindow"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Show Window</a></div>
 </div>
@@ -96,6 +114,24 @@
   z-index: 1;
    opacity: .95;
    bottom: 2px;
+}
+#hiddenShoutWindow{
+    display: none;
+  position: absolute;
+  z-index: 1;
+   opacity: .95;
+   bottom: 75px;
+}
+#shout_content {
+  position: absolute;
+  z-index: 1;
+   opacity: .75;
+   left: 4px;
+   bottom: 8px;
+}
+#s_msgs {
+  height: 300px;
+  overflow: auto;
 }
 #map-canvas {
   height: 100%;
@@ -201,6 +237,8 @@ $(document).ready(function(){
   var $OWbttn = $('#openChatWindow');
   var $cancelbttn = $('#cancelbttn');
   var $canceldiv = $('#cancel_req');
+  var $closeshout = $("#closeshout");
+  var $sendshoutbttn = $("#sendshoutbttn");
   var socket  = io.connect('http://45.55.159.108:80');
   var data_one;
   var data_two;
@@ -213,6 +251,7 @@ $(document).ready(function(){
   var global_to;
   var global_from;
   var global_user;
+  var colors = ["#31B404","#B40404","#08088A","#DF3A01","#8A0886"];
   $msgbox.prop("disabled", true);
   $username.prop('disabled', true);
   $registerBttn.prop('disabled', true);
@@ -237,6 +276,10 @@ $(document).ready(function(){
      }
   function updateScroll(){
       var element = document.getElementById("messages");
+      element.scrollTop = element.scrollHeight;
+  }
+     function updateShoutScroll(){
+      var element = document.getElementById("s_msgs");
       element.scrollTop = element.scrollHeight;
   }
 socket.on("send-users", function(dataArr){
@@ -310,6 +353,51 @@ socket.on("send-users", function(dataArr){
     event.preventDefault();
     $('#chatwindow').show();
      $('#hiddenChatWindow').hide();
+  });
+    $sendshoutbttn.click(function(event){
+    event.preventDefault();
+    var shoutmsg = $("#shouttextfield").val();
+    if(null == uname){
+      from = "anonymous";
+    } else {
+      from = uname;
+    }
+    socket.emit("send_shout", from, shoutmsg);
+    $("#shouttextfield").val("");
+  });
+  $closeshout.click(function(event){
+    event.preventDefault();
+      $("#shout_content").hide();
+       $("#hiddenShoutWindow").show();
+  });
+  $("#openShoutWindow").click(function(event){
+    event.preventDefault();
+     $("#shout_content").show();
+     $("#hiddenShoutWindow").hide();
+  });
+ $("#sendshoutform").submit(function(event){
+    event.preventDefault();
+    var shoutmsg = $("#shouttextfield").val();
+    if(null == uname){
+      from = "anonymous";
+    } else {
+      from = uname;
+    }
+    socket.emit("send_shout", from, shoutmsg);
+    $("#shouttextfield").val("");
+  });
+
+  socket.on("post_shout", function(from, msg){
+    var ind_color = Math.floor((Math.random() * 4) + 0);
+    var color = colors[ind_color];
+    $("#s_msgs").append("<b><font color=" + color + "> " + from + "</font> : " + msg + "</b><br>");
+    updateShoutScroll();
+  });
+  socket.on("load_shouts", function(from, data){
+    var ind_color = Math.floor((Math.random() * 4) + 0);
+    var color = colors[ind_color];
+        $("#s_msgs").append("<b><font color=" + color + "> " + from + "</font> : " + data + "</b><br>");
+        updateShoutScroll();
   });
   $('#endbttn').click(function(event){
     event.preventDefault();
@@ -458,6 +546,7 @@ socket.on("send-users", function(dataArr){
       }
        map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
        socket.emit("map-loaded");
+        socket.emit("get_all_shouts");
       var latlng = new google.maps.LatLng(lat,longi);
       google.maps.event.addDomListener(window, 'load', showPosition);
   }

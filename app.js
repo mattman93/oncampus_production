@@ -4,7 +4,7 @@ var client = redis.createClient(6379, '45.55.159.108');
 var app = connect();
 client.on('connect', function(){
   console.log("connected");
-});
+ });
 var server = require('http').createServer(
 	function(req, response){
 		fs.readFile(__dirname + '/index.html',
@@ -225,12 +225,11 @@ socket.on("get_all_shouts", function(){
 	}
 	for(var i=0; i<amount_to_get; i++){   
                post_key = all_keys[i];
-client.get(post_key.toString(), function(err, msg){
 		var arr = post_key.split(':');
 		var from_key = arr[0];
-	
+	client.get(post_key.toString(), function(err, msg){
 		socket.emit("load_shouts", from_key, msg);
-              });
+              			});
 			}
 		} 
          });

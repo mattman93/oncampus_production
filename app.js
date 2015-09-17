@@ -25,9 +25,11 @@ var url = require('url');
 var http = require('http');
 var mysql      = require('mysql');
 var connection = mysql.createConnection({
-  host     : 'localhost:8080',
+  host     : 'localhost',
   user     : 'root',
-  password : 'rangers94'
+  port     : '8080',
+  password : 'rangers94',
+  database  : 'shouts'
 });
 
 connection.connect();
@@ -214,6 +216,9 @@ socket.on("end", function(uname){
       }
         });
 socket.on("send_shout", function(from, msg){
+  var post  = {sender: from, message: msg};
+    var query = connection.query('INSERT INTO messages SET ?', post, function(err, result) {
+    });
   var key = from + ":" + makeid();
       //client.set(key, msg);
        client.rpush(key, from, msg, function(err, respnse){

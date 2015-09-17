@@ -1,3 +1,9 @@
+var redis = require('redis');
+var client = redis.createClient(6379, '45.55.159.108');
+var app = connect();
+client.on('connect', function(){
+  console.log("connected");
+});
 var server = require('http').createServer(
 	function(req, response){
 		fs.readFile(__dirname + '/index.html',
@@ -17,12 +23,6 @@ var path = require('path');
 var url = require('url');
 var http = require('http');
 var connect = require('connect');
-var redis = require('redis');
-var client = redis.createClient(6379, '45.55.159.108');
-var app = connect();
-client.on('connect', function(){
-  console.log("connected");
-});
  var users = [];
   var userData = [];
 

@@ -238,7 +238,8 @@ socket.on("get_all_shouts", function(){
      client.lrange(post_key.toString(), 0, -1, function(err, res){
                 socket.emit("load_shouts", res); 
              });
-	       	} 
+	       	}
+	} 
      });
 });
 socket.on('disconnect', function(){

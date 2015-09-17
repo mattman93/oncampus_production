@@ -215,8 +215,9 @@ socket.on("send_shout", function(from, msg){
              var user = reply[0];
              var message = reply[1];
           io.sockets.emit("post_shout", user, message);
-        });
-         }
+       		 });
+             }
+	});
 });
 
 socket.on("get_all_shouts", function(){

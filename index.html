@@ -391,6 +391,8 @@ socket.on("send-users", function(dataArr){
     var ind_color = Math.floor((Math.random() * 4) + 0);
     var color = colors[ind_color];
     $("#s_msgs").append("<b><font color=" + color + "> " + from + "</font> : " + msg + "</b><br>");
+    var audio = new Audio('pop.mp3');
+    audio.play();
     updateShoutScroll();
   });
   socket.on("load_shouts", function(data){
@@ -399,6 +401,8 @@ socket.on("send-users", function(dataArr){
     var ind_color = Math.floor((Math.random() * 4) + 0);
     var color = colors[ind_color];
         $("#s_msgs").append("<b><font color=" + color + "> " + from_key + "</font> : " + message + "</b><br>");
+        var audio = new Audio('pop.mp3');
+        audio.play();
         updateShoutScroll();
   });
   $('#endbttn').click(function(event){

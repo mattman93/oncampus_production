@@ -224,14 +224,15 @@ socket.on("get_all_shouts", function(){
 	amount_to_get = 100;
 	}
 	for(var i=0; i<amount_to_get; i++){   
-               post_key = all_keys[i]; 
-               client.get(post_key.toString(), function(err, msg){
-                var arr = post_key.split(':');
-                var from_key = arr[0];
-                socket.emit("load_shouts", from_key, msg); 
-               });
-              }
-	} 
+               post_key = all_keys[i];
+client.get(post_key.toString(), function(err, msg){
+		var arr = post_key.split(':');
+		var from_key = arr[0];
+	
+		socket.emit("load_shouts", from_key, msg);
+              });
+			}
+		} 
          });
 });
 socket.on('disconnect', function(){

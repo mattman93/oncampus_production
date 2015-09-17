@@ -23,6 +23,15 @@ var fs = require('fs');
 var path = require('path');
 var url = require('url');
 var http = require('http');
+var mysql      = require('mysql');
+var connection = mysql.createConnection({
+  host     : 'localhost:8080',
+  user     : 'root',
+  password : 'rangers94'
+});
+
+connection.connect();
+
  var users = [];
   var userData = [];
 

@@ -206,10 +206,17 @@ socket.on("end", function(uname){
         });
 socket.on("send_shout", function(from, msg){
   var key = from + ":" + makeid();
-      client.set(key, msg);
-      client.get(key, function(err, reply) {
-          io.sockets.emit("post_shout", from, reply);
+      //client.set(key, msg);
+       client.rpush(key, from, msg, function(err, respnse){
+          if(err){
+              console.log(err);
+         } else {
+           client.lrange(key, 0, -1, function(err, reply) {
+             var user = reply[0];
+             var message = reply[1];
+          io.sockets.emit("post_shout", user, message);
         });
+         }
 });
 
 socket.on("get_all_shouts", function(){
@@ -224,12 +231,15 @@ socket.on("get_all_shouts", function(){
 	amount_to_get = 100;
 	}
 	for(var i=0; i<amount_to_get; i++){   
-               post_key = all_keys[i];
+   post_key = all_keys[i];
 		var arr = post_key.split(':');
 		var from_key = arr[0];
-	client.get(post_key.toString(), function(err, msg){
-		socket.emit("load_shouts", from_key, msg);
-              			});
+     client.lrange(post_key.toString(), 0, -1, function(err, res){
+                socket.emit("load_shouts", res); 
+               });
+	//client.get(post_key.toString(), function(err, msg){
+	//	socket.emit("load_shouts", from_key, msg);
+   //           			});
 			}
 		} 
          });

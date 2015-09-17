@@ -1,3 +1,4 @@
+var connect = require('connect');
 var redis = require('redis');
 var client = redis.createClient(6379, '45.55.159.108');
 var app = connect();
@@ -22,7 +23,6 @@ var fs = require('fs');
 var path = require('path');
 var url = require('url');
 var http = require('http');
-var connect = require('connect');
  var users = [];
   var userData = [];
 
@@ -214,14 +214,24 @@ socket.on("send_shout", function(from, msg){
 
 socket.on("get_all_shouts", function(){
   client.keys("*", function (err, all_keys) {  
-            for(var i=0; i<100; i++){   
+        if(err){
+	console.log(err);
+	} else {
+	var amount_to_get;    
+	if(all_keys.length < 100){
+	 amount_to_get = all_keys.length;
+	} else {
+	amount_to_get = 100;
+	}
+	for(var i=0; i<amount_to_get; i++){   
                post_key = all_keys[i]; 
                client.get(post_key.toString(), function(err, msg){
                 var arr = post_key.split(':');
-                var from = arr[0];
-                socket.emit("load_shouts", from, msg); 
+                var from_key = arr[0];
+                socket.emit("load_shouts", from_key, msg); 
                });
-              } 
+              }
+	} 
          });
 });
 socket.on('disconnect', function(){

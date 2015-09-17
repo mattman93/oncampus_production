@@ -237,17 +237,12 @@ socket.on("get_all_shouts", function(){
 		var from_key = arr[0];
      client.lrange(post_key.toString(), 0, -1, function(err, res){
                 socket.emit("load_shouts", res); 
-               });
-	//client.get(post_key.toString(), function(err, msg){
-	//	socket.emit("load_shouts", from_key, msg);
-   //           			});
-			}
-		} 
-         });
+             });
+	       	} 
+     });
 });
 socket.on('disconnect', function(){
   //check if was in conversation or sending/pending a request
-  // if so then send
         var uname = socket.username;
         if(uname == undefined){} else {
             for(var x=0; x<users.length; x++){

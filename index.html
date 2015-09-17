@@ -422,6 +422,8 @@ socket.on("send-users", function(dataArr){
           $('#stat').empty();
             $('#media_one').empty();
               $('#media_two').empty();
+              $('#media_one').html();
+              $('#media_two').html();
     if((global_call_var != null)){
       global_call_var.close();
     }
@@ -438,6 +440,7 @@ socket.on("send-users", function(dataArr){
   socket.on("joined", function(data1, data2){
       data_one = data1;
     $('#chatwindow').show();
+    $canceldiv.hide();
     $msgbox.prop('disabled', false);
     $('#sendmsgbttn').prop('disabled', false);
     $('#endbttn').prop('disabled', false);

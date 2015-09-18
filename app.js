@@ -32,8 +32,14 @@ var connection = mysql.createConnection({
   database  : 'shouts'
 });
 db = 'shouts'
-connection.connect();
+connection.connect(function(err){
+	if(err){
+		console.log(err);
+		return;
+	}
+   });
 connection.query("USE " + db);
+
  var users = [];
   var userData = [];
 

@@ -31,9 +31,9 @@ var connection = mysql.createConnection({
   password : 'rangers94',
   database  : 'shouts'
 });
-
+db = 'shouts'
 connection.connect();
-
+connection.query("USE " + db);
  var users = [];
   var userData = [];
 
@@ -216,8 +216,12 @@ socket.on("end", function(uname){
       }
         });
 socket.on("send_shout", function(from, msg){
-  var post  = {sender: from, message: msg};
-    var query = connection.query('INSERT INTO messages ?', post, function(err, result) {
+  var post  = {
+      sender: from, 
+      message: msg
+     };
+    var query = connection.query('INSERT INTO messages SET ?', post, function(err, result) {
+      if(err){ throw err }
     });
   var key = from + ":" + makeid();
       //client.set(key, msg);

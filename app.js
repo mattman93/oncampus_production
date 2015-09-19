@@ -24,22 +24,6 @@ var path = require('path');
 var url = require('url');
 var http = require('http');
 var mysql      = require('mysql');
-var connection = mysql.createConnection({
-  host     : 'localhost',
-  port     : '8080',
-  user     : 'root',
-  password : 'rangers94',
-  database  : 'shouts'
-});
-db = 'shouts'
-connection.connect(function(err){
-	if(err){
-		console.log(err);
-		return;
-	}
-   });
-connection.query("USE " + db);
-
  var users = [];
   var userData = [];
 
@@ -222,13 +206,6 @@ socket.on("end", function(uname){
       }
         });
 socket.on("send_shout", function(from, msg){
-  var post  = {
-      sender: from, 
-      message: msg
-     };
-    var query = connection.query('INSERT INTO messages SET ?', post, function(err, result) {
-      if(err){ throw err }
-    });
   var key = from + ":" + makeid();
       //client.set(key, msg);
        client.rpush(key, from, msg, function(err, respnse){

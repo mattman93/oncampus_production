@@ -3,7 +3,7 @@ var redis = require('redis');
 var client = redis.createClient(6379, '45.55.159.108');
 var app = connect();
 client.on('connect', function(){
-  console.log("connected");
+  console.log("redis connected");
  });
 var mysql      = require('mysql');
  var connection = mysql.createConnection({
@@ -15,10 +15,22 @@ var mysql      = require('mysql');
  });
  connection.connect(function(err){
  if(!err) {
-     console.log("Database is connected ... \n\n");  
- } else {
-     console.log("Error connecting database ... \n\n");  
- }
+  db = 'shouts';
+  connection.query("USE " + db);
+     console.log("mysql connected ...");  
+      var post = {
+      sender : "test",
+      message : "test"
+    };
+ var query = connection.query('INSERT INTO messages SET ?', post, function(err, result) {
+      function selectCb(err, results){
+      if(err){ throw err; } else {
+        console.log("test query successful");
+      }
+      }
+    });
+ } 
+
  });
 var server = require('http').createServer(
 	function(req, response){

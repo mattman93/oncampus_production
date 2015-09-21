@@ -16,19 +16,6 @@ var mysql      = require('mysql');
  connection.connect(function(err){
  if(!err) {
      console.log("mysql connected ...");  
-      db = 'shouts';
-   connection.query("USE " + db);
-      var post = {
-      sender : "test user",
-      message : "test message"
-    };
- var query = connection.query('INSERT INTO messages SET ?', post, function(err, result) {
-      function selectCb(err, results){
-      if(err){ throw err; } else {
-        console.log("test query successful");
-      }
-      }
-    });
  } 
 
  });
@@ -233,6 +220,19 @@ socket.on("end", function(uname){
       }
         });
 socket.on("send_shout", function(from, msg){
+ db = 'shouts';
+   connection.query("USE " + db);
+      var post = {
+      sender : from,
+      message : msg
+    };
+ var query = connection.query('INSERT INTO messages SET ?', post, function(err, result) {
+      function selectCb(err, results){
+      if(err){ throw err; } else {
+        console.log("test query successful");
+        }
+      }
+    });
   var key = from + ":" + makeid();
       //client.set(key, msg);
        client.rpush(key, from, msg, function(err, respnse){

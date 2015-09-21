@@ -249,7 +249,7 @@ socket.on("send_shout", function(from, msg){
 });
 
 socket.on("get_all_shouts", function(){
-  client.query("SELECT * FROM shouts ORDER BY(id) DESC LIMIT 100",
+  connection.query("SELECT * FROM messages ORDER BY(id) ASC LIMIT 100",
       function selectCb(err, results){
       if(err){ throw err; }
       var string_s = '';
@@ -258,12 +258,12 @@ socket.on("get_all_shouts", function(){
          for(var i = 0; i < strlen; i++){
             var sender = string_s + results[i].sender;
             var message = string_m + results[i].message
-            console.log(sender + " : " + message);
+           // console.log(sender + " : " + message);
+		socket.emit("load_shouts", sender, message);
 
                     }
-
       });
-  client.keys("*", function (err, all_keys) {  
+ /* client.keys("*", function (err, all_keys) {  
         if(err){
 	console.log(err);
 	} else {
@@ -283,6 +283,7 @@ socket.on("get_all_shouts", function(){
 	       	}
 	} 
      });
+*/
 });
 socket.on('disconnect', function(){
   //check if was in conversation or sending/pending a request

@@ -393,12 +393,10 @@ socket.on("send-users", function(dataArr){
     $("#s_msgs").append("<b><font color=" + color + "> " + from + "</font> : " + msg + "</b><br>");
     updateShoutScroll();
   });
-  socket.on("load_shouts", function(data){
-    var from_key = data[0];
-    var message = data[1];
+  socket.on("load_shouts", function(sender, message){
     var ind_color = Math.floor((Math.random() * 4) + 0);
     var color = colors[ind_color];
-        $("#s_msgs").append("<b><font color=" + color + "> " + from_key + "</font> : " + message + "</b><br>");
+        $("#s_msgs").append("<b><font color=" + color + "> " + sender + "</font> : " + message + "</b><br>");
         updateShoutScroll();
   });
   $('#endbttn').click(function(event){

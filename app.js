@@ -5,6 +5,21 @@ var app = connect();
 client.on('connect', function(){
   console.log("connected");
  });
+var mysql      = require('mysql');
+ var connection = mysql.createConnection({
+   host     : 'localhost',
+   user     : 'root',
+   port     : '8080',
+   password : 'rangers94',
+   database : 'shouts'
+ });
+ connection.connect(function(err){
+ if(!err) {
+     console.log("Database is connected ... \n\n");  
+ } else {
+     console.log("Error connecting database ... \n\n");  
+ }
+ });
 var server = require('http').createServer(
 	function(req, response){
 		fs.readFile(__dirname + '/index.html',

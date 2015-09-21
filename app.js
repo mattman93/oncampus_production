@@ -229,9 +229,9 @@ socket.on("send_shout", function(from, msg){
  var query = connection.query('INSERT INTO messages SET ?', post, function(err, result) {
       function selectCb(err, results){
       if(err){ throw err; }
-        io.sockets.emit("post_shout", from, msg);
       }
     });
+   io.sockets.emit("post_shout", from, msg);
 /*  var key = from + ":" + makeid();
       //client.set(key, msg);
        client.rpush(key, from, msg, function(err, respnse){

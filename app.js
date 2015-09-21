@@ -9,18 +9,18 @@ var mysql      = require('mysql');
  var connection = mysql.createConnection({
    host     : 'localhost',
    user     : 'root',
-   port     : '8080',
+   port     : '3306',
    password : 'rangers94',
    database : 'shouts'
  });
  connection.connect(function(err){
  if(!err) {
-  db = 'shouts';
-  connection.query("USE " + db);
      console.log("mysql connected ...");  
+      db = 'shouts';
+   connection.query("USE " + db);
       var post = {
-      sender : "test",
-      message : "test"
+      sender : "test user",
+      message : "test message"
     };
  var query = connection.query('INSERT INTO messages SET ?', post, function(err, result) {
       function selectCb(err, results){

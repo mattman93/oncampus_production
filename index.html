@@ -423,6 +423,7 @@ socket.on("bad_credentials", function(msg){
    $('#error').html("<b><font color='white'>" + msg + " </font></b>");
    $("#error").show();
    $form.show();
+   $("#admin").hide();
 });
 $("#adminloginbttn").click(function(event){
   event.preventDefault();

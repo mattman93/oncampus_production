@@ -113,13 +113,9 @@ socket.on("check-in", function(username, lat, longi){
                   }
                         });
 socket.on("check_cred", function(pass, username, lat, longi){
-  var admin_data = {
-    user : username,
-    pass : pass
-  }
-        connection.query("SELECT user FROM users WHERE ?", admin_data,
+        connection.query("SELECT user FROM users WHERE user = ? AND pass = ?", [username, pass],
       function selectCb(err, results){
-      if(results.length > 0){
+      if(results){
         var strlen = results.length;
            if(users.indexOf(username) > -1){
                var msg = "there is already a user by that name";

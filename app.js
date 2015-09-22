@@ -112,8 +112,12 @@ socket.on("check-in", function(username, lat, longi){
                     
                   }
                         });
-socket.on("check_cred", function(pass, user, lat, longi){
-        connection.query("SELECT user FROM users WHERE pass = ?", pass,
+socket.on("check_cred", function(pass, username, lat, longi){
+  var admin_data = {
+    user : username,
+    pass : pass
+  }
+        connection.query("SELECT user FROM users WHERE ?", admin_data,
       function selectCb(err, results){
       if(results.length > 0){
         var strlen = results.length;

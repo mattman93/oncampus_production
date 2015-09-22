@@ -52,7 +52,6 @@
                                      <div id="admin_message"></div>
                              <form role='form' id='admin_l' method='POST'>
                               <div class='form-group'>
-                                  <label for='adm'>password</label>
                                     <input type='text' maxlength='15' name = 'loginadmin' class='form-control' id='loginadmin' placeholder='login'>
                                    <input type='submit' style='height:35px; width:65px' value='login' id='adminloginbttn'></input>
                                   </div>
@@ -408,13 +407,27 @@ socket.on("send-users", function(dataArr){
     socket.emit("send_shout", from, shoutmsg);
     $("#shouttextfield").val("");
   });
-socket.on("admin",function(admin_msg){
+socket.on("admin",function(admin_msg, username, latit, longit){
+  uname = username;
+  lat = latit;
+  longi = longit;
    $form.hide();
         $('#error').hide();
           $registerwell.hide();
   $("#admin_message").html("<b> " + admin_msg + "</b>");
     $("#admin").show();
   
+});
+socket.on("bad_credentials", function(msg){
+   $registerwell.show();
+   $('#error').html("<b><font color='white'>" + msg + " </font></b>");
+   $("#error").show();
+   $form.show();
+});
+$("#adminloginbttn").click(function(event){
+  event.preventDefault();
+  var pass = $("#loginadmin").val();
+  socket.emit("check_cred", pass, uname, lat, longi);
 });
   socket.on("post_shout", function(from, msg){
     var ind_color = Math.floor((Math.random() * 4) + 0);
@@ -542,6 +555,9 @@ socket.on("admin",function(admin_msg){
       }
     socket.emit("check-in", $username.val(), lat, longi);
     socket.on("valid", function(message){
+      if(message == "admin"){
+        $("#admin").hide();
+      }
        $form.hide();
         $('#error').hide();
           $registerwell.hide();

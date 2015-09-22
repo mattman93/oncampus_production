@@ -81,6 +81,45 @@ socket.on("check-in", function(username, lat, longi){
   if(users.indexOf(username) > -1){
     var msg = "there is already a user by that name";
     socket.emit("register_error", msg);
+  } else if(username == "TheDreadPirate" || "thedreadpirate" || "TDP"){
+              var messge = " TheDreadPirate is an admin account, please login to use";
+              socket.emit("admin", messge, username, lat, longi);
+             }
+      else {
+        var user = {
+            lat: lat,
+            longi: longi,
+            username: username,
+             beingRequested : false,
+             isinconv : false,
+             chatPartner : null,
+          } 
+            var id = makeid();
+             socket.user = id
+             socket.username = username;
+             users[socket.username] = socket;
+             socket.Rid = id;
+             socket.lat = lat;
+             socket.longi = longi;
+             users.push(socket.username);
+             userData.push(user);
+             mod_loc(users);
+             mod_loc(userData);
+                  console.log("array len: " + users.length);
+                  var status = "user created";
+                  socket.emit("valid", status);
+                    socket.broadcast.emit("update-map", userData);
+                    
+                  }
+                        });
+socket.on("check_cred", function(pass, user, lat, longi){
+        connection.query("SELECT user FROM users WHERE pass = ?", pass,
+      function selectCb(err, results){
+      if(results.length > 0){
+        var strlen = results.length;
+           if(users.indexOf(username) > -1){
+               var msg = "there is already a user by that name";
+               socket.emit("register_error", msg);
   } else {
         var user = {
             lat: lat,
@@ -101,18 +140,17 @@ socket.on("check-in", function(username, lat, longi){
              userData.push(user);
              mod_loc(users);
              mod_loc(userData);
-             if(username == "TheDreadPirate" || "thedreadpirate" || "TDP"){
-              var messge = " TheDreadPirate is an admin account, please login to use";
-              socket.emit("admin", messge);
-             } else {
-                  console.log("array len: " + users.length);
-                  var status = "user created";
-                  socket.emit("valid", status);
+            var status = "admin";
+            socket.emit("valid", status);
                     socket.broadcast.emit("update-map", userData);
-                    }
-                  }
-                        });
 
+                   }
+                 } else {
+                  var msgg = " password invalid";
+                  socket.emit("bad_credentials", msgg);
+                 }
+      });
+});
 socket.on("chat-request", function(to, from){
           console.log('##### request received on server #####');
           var emitTarget = users.indexOf(to);

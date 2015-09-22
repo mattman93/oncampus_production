@@ -278,7 +278,6 @@ socket.on("send_shout", function(from, msg, isAdmin){
  if(isAdmin){
       connection.query("SELECT image FROM images WHERE user = ?",[from], function(err, rows){
 	var encoded = new Buffer(rows[0], 'binary');
-	console.log(encoded.toString());
   	 io.sockets.emit("post_admin_shout", from, msg, rows[0]);
  });
  } else {

@@ -440,7 +440,7 @@ $("#adminloginbttn").click(function(event){
   socket.on("post_admin_shout", function(from, msg, data){
     var ind_color = Math.floor((Math.random() * 4) + 0);
     var color = colors[ind_color];
-    $("#s_msgs").append("<img height='12' width='12' src=data:image/jpeg;base64,"+data+" /><b><font color=" + color + "> " + from + "</font> : " + msg + "</b><br>");
+    $("#s_msgs").append("<img height='12' width='12' src=data:image/png;base64,"+data+" /><b><font color=" + color + "> " + from + "</font> : " + msg + "</b><br>");
     updateShoutScroll();
   });
   socket.on("load_shouts", function(sender, message){

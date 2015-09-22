@@ -272,6 +272,7 @@ $(document).ready(function(){
   var global_to;
   var global_from;
   var global_user;
+  var isAdmin = false;
   var colors = ["#31B404","#B40404","#08088A","#DF3A01","#8A0886"];
   $msgbox.prop("disabled", true);
   $username.prop('disabled', true);
@@ -404,7 +405,7 @@ socket.on("send-users", function(dataArr){
     } else {
       from = uname;
     }
-    socket.emit("send_shout", from, shoutmsg);
+    socket.emit("send_shout", from, shoutmsg, isAdmin);
     $("#shouttextfield").val("");
   });
 socket.on("admin",function(admin_msg, username, latit, longit){
@@ -434,6 +435,12 @@ $("#adminloginbttn").click(function(event){
     var ind_color = Math.floor((Math.random() * 4) + 0);
     var color = colors[ind_color];
     $("#s_msgs").append("<b><font color=" + color + "> " + from + "</font> : " + msg + "</b><br>");
+    updateShoutScroll();
+  });
+  socket.on("post_admin_shout", function(from, msg, path){
+    var ind_color = Math.floor((Math.random() * 4) + 0);
+    var color = colors[ind_color];
+    $("#s_msgs").append("<img height='10' width='10' src=" + path +"></img><b><font color=" + color + "> " + from + "</font> : " + msg + "</b><br>");
     updateShoutScroll();
   });
   socket.on("load_shouts", function(sender, message){
@@ -558,6 +565,7 @@ $("#adminloginbttn").click(function(event){
     socket.on("valid", function(message){
       if(message == "admin"){
         $("#admin").hide();
+        isAdmin = true;
       }
        $form.hide();
         $('#error').hide();

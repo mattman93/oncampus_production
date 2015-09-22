@@ -263,7 +263,7 @@ socket.on("end", function(uname){
                   }
       }
         });
-socket.on("send_shout", function(from, msg){
+socket.on("send_shout", function(from, msg, isAdmin){
  db = 'shouts';
    connection.query("USE " + db);
       var post = {
@@ -275,7 +275,12 @@ socket.on("send_shout", function(from, msg){
       if(err){ throw err; }
       }
     });
+ if(isAdmin){
+  var adminImgPath = "images/dpr.png";
+ io.sockets.emit("post_admin_shout", from, msg, adminImgPath);
+ } else {
    io.sockets.emit("post_shout", from, msg);
+ }
 });
 
 socket.on("get_all_shouts", function(){

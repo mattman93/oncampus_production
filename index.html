@@ -45,7 +45,20 @@
           </div>
          </div>
      </div>
-<div id="admin"></div>
+<div id="admin">
+<div class='col-sm-4'>
+                 <div id ='adminlogin' class='well well-lg'>
+                           <center>
+                                     <div id="admin_message"></div>
+                             <form role='form' id='admin_l' method='POST'>
+                              <div class='form-group'>
+                                  <label for='adm'>password</label>
+                                    <input type='text' maxlength='15' name = 'loginadmin' class='form-control' id='loginadmin' placeholder='login'>
+                                   <input type='submit' style='height:35px; width:65px' value='login' id='adminloginbttn'></input>
+                                  </div>
+                               </div>
+                           </div>
+                        </div>
 <div class="panel panel-primary" id="chatwindow">
       <br><center>
         <div id="messages"></div>
@@ -394,11 +407,11 @@ socket.on("send-users", function(dataArr){
     socket.emit("send_shout", from, shoutmsg);
     $("#shouttextfield").val("");
   });
-socket.on("admin", html_data){
+socket.on("admin", admin_msg){
    $form.hide();
         $('#error').hide();
           $registerwell.hide();
-  $("#admin").html(html_data);
+  $("#admin_message").html("<b> " + admin_msg + "</b>");
     $("#admin").show();
   
 }

@@ -102,21 +102,8 @@ socket.on("check-in", function(username, lat, longi){
              mod_loc(users);
              mod_loc(userData);
              if(username == "TheDreadPirate" || "thedreadpirate" || "TDP"){
-              var html =   " <div class='col-sm-4'>
-                                      <div id ='adminlogin' class='well well-lg'>
-                                      <center>
-                                      TheDreadPirate is an admin account, please login to use
-                                      <form role='form' id='admin_l' method='POST'>
-                                       <div class='form-group'>
-                                       <label for='adm'>password</label>
-                                       <input type='text' maxlength='15' name = 'loginadmin' class='form-control' id='loginadmin' placeholder='login'>
-                                       <input type='submit' style='height:35px; width:65px' value='login' id='adminloginbttn'></input>
-                                    </div>
-                                 </div>
-                            </div>
-                      ";
-              socket.emit("admin", html);
-               socket.broadcast.emit("update-map", userData);
+              var messge = " TheDreadPirate is an admin account, please login to use";
+              socket.emit("admin", messge);
              } else {
                   console.log("array len: " + users.length);
                   var status = "user created";

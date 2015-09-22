@@ -113,10 +113,11 @@ socket.on("check-in", function(username, lat, longi){
                   }
                         });
 socket.on("check_cred", function(pass, username, lat, longi){
-        connection.query("SELECT user FROM users WHERE user = ? AND pass = ?", [username, pass],
+        connection.query("SELECT pass FROM users WHERE user = ? ", [username],
       function selectCb(err, results){
-      if(results){
-        var strlen = results.length;
+        if(err){ throw err; }
+        var passwd = results[0].pass;
+        if(pass == passwd){
            if(users.indexOf(username) > -1){
                var msg = "there is already a user by that name";
                socket.emit("register_error", msg);

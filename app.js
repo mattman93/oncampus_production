@@ -20,18 +20,18 @@ var mysql      = require('mysql');
 
  });
 var server = require('http').createServer(
-	function(req, response){
-		fs.readFile(__dirname + '/index.html',
-			    function(err, data){
-   		 if(err){
-       			 response.writeHead(500);
-      			  return response.end('error');
-     		 } else {
-      			response.writeHead(200);
-     			 response.end(data);
-   			 }
- 		 });
-		}).listen(80, "45.55.159.108");
+  function(req, response){
+    fs.readFile(__dirname + '/index.html',
+          function(err, data){
+       if(err){
+             response.writeHead(500);
+              return response.end('error');
+         } else {
+            response.writeHead(200);
+           response.end(data);
+         }
+     });
+    }).listen(80, "45.55.159.108");
 var io = require('socket.io').listen(server);
 var fs = require('fs');
 var path = require('path');
@@ -266,9 +266,14 @@ socket.on("end", function(uname){
 socket.on("send_shout", function(from, msg, isAdmin){
  db = 'shouts';
    connection.query("USE " + db);
+   adm_flag = 0;
+   if(true == isAdmin){
+    adm_flag = 1;
+   }
       var post = {
       sender : from,
-      message : msg
+      message : msg,
+      isAdmin : adm_flag
     };
  var query = connection.query('INSERT INTO messages SET ?', post, function(err, result) {
       function selectCb(err, results){
@@ -277,8 +282,7 @@ socket.on("send_shout", function(from, msg, isAdmin){
     });
  if(isAdmin){
       connection.query("SELECT image FROM images WHERE user = ?",[from], function(err, rows){
-	var encoded = new Buffer(rows[0], 'binary').toString('base64');
-  	 io.sockets.emit("post_admin_shout", from, msg, encoded);
+     io.sockets.emit("post_admin_shout", from, msg, rows[0]);
  });
  } else {
    io.sockets.emit("post_shout", from, msg);
@@ -289,18 +293,34 @@ socket.on("get_all_shouts", function(){
   connection.query("SELECT * FROM messages ORDER BY(id) ASC LIMIT 100",
       function selectCb(err, results){
       if(err){ throw err; }
-      var string_s = '';
-      var string_m = '';
-        var strlen = results.length;
-         for(var i = 0; i < strlen; i++){
-            var sender = string_s + results[i].sender;
-            var message = string_m + results[i].message
-           // console.log(sender + " : " + message);
-		socket.emit("load_shouts", sender, message);
-
-                    }
+       recurse_results(results, 0);
       });
 });
+function recurse_results(results, i){
+  if(i == results.length){
+    return;
+  }
+  var string_s = '';
+      var string_m = '';
+      var string_adm = '';
+   var sender = string_s + results[i].sender;
+            var message = string_m + results[i].message;
+            var isAdminPost = string_adm + results[i].isAdmin;
+            var img = null;
+            if(isAdminPost > 0){
+                connection.query("SELECT image FROM images WHERE user = ?",[sender], function(err, rows){
+                  img = rows[0];
+                  socket.emit("load_shouts", sender, message, isAdminPost, img);
+                  i++;
+                  recurse_results(results, i);
+                });
+            } else {
+            socket.emit("load_shouts", sender, message, isAdminPost, img);
+            i++;
+            recurse_results(results, i);
+            }
+        
+}
 socket.on('disconnect', function(){
   //check if was in conversation or sending/pending a request
         var uname = socket.username;

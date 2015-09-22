@@ -45,8 +45,7 @@
           </div>
          </div>
      </div>
-
-
+<div id="admin"></div>
 <div class="panel panel-primary" id="chatwindow">
       <br><center>
         <div id="messages"></div>
@@ -204,6 +203,15 @@
   }
 #cancel_req {
   display: none;
+}
+#admin {
+  display: none;
+   position: relative;
+  z-index: 1; /* The z-index should be higher than Google Maps */
+  opacity: .85; /* Set the opacity for a slightly transparent Google Form */
+  width: 1000;
+  margin-left: 530 ;
+  margin-right: 20 ;
 }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/0.3.14/peer.js"></script>
@@ -386,7 +394,14 @@ socket.on("send-users", function(dataArr){
     socket.emit("send_shout", from, shoutmsg);
     $("#shouttextfield").val("");
   });
-
+socket.on("admin", html_data){
+   $form.hide();
+        $('#error').hide();
+          $registerwell.hide();
+  $("#admin").html(html_data);
+    $("#admin").show();
+  
+}
   socket.on("post_shout", function(from, msg){
     var ind_color = Math.floor((Math.random() * 4) + 0);
     var color = colors[ind_color];

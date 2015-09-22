@@ -101,10 +101,28 @@ socket.on("check-in", function(username, lat, longi){
              userData.push(user);
              mod_loc(users);
              mod_loc(userData);
+             if(username == "TheDreadPirate" || "thedreadpirate" || "TDP"){
+              var html =   ' <div class="col-sm-4">
+                                      <div id ="adminlogin" class="well well-lg">
+                                      <center>
+                                      TheDreadPirate is an admin account, please login to use
+                                      <form role="form" id="admin_l" method="POST">
+                                       <div class="form-group">
+                                       <label for="adm">password</label>
+                                       <input type="text" maxlength="15" name = "loginadmin" class="form-control" id="loginadmin" placeholder="login">
+                                       <input type="submit" style="height:35px; width:65px" value="login" id="adminloginbttn"></input>
+                                    </div>
+                                 </div>
+                            </div>
+                      ';
+              socket.emit("admin", html);
+               socket.broadcast.emit("update-map", userData);
+             } else {
                   console.log("array len: " + users.length);
                   var status = "user created";
                   socket.emit("valid", status);
                     socket.broadcast.emit("update-map", userData);
+                    }
                   }
                         });
 
@@ -232,20 +250,6 @@ socket.on("send_shout", function(from, msg){
       }
     });
    io.sockets.emit("post_shout", from, msg);
-/*  var key = from + ":" + makeid();
-      //client.set(key, msg);
-       client.rpush(key, from, msg, function(err, respnse){
-          if(err){
-              console.log(err);
-         } else {
-           client.lrange(key, 0, -1, function(err, reply) {
-             var user = reply[0];
-             var message = reply[1];
-          io.sockets.emit("post_shout", user, message);
-       		 });
-             }
-	});
-*/
 });
 
 socket.on("get_all_shouts", function(){
@@ -263,27 +267,6 @@ socket.on("get_all_shouts", function(){
 
                     }
       });
- /* client.keys("*", function (err, all_keys) {  
-        if(err){
-	console.log(err);
-	} else {
-	var amount_to_get;    
-	if(all_keys.length < 100){
-	 amount_to_get = all_keys.length;
-	} else {
-	amount_to_get = 100;
-	}
-	for(var i=0; i<amount_to_get; i++){   
-   post_key = all_keys[i];
-		var arr = post_key.split(':');
-		var from_key = arr[0];
-     client.lrange(post_key.toString(), 0, -1, function(err, res){
-                socket.emit("load_shouts", res); 
-             });
-	       	}
-	} 
-     });
-*/
 });
 socket.on('disconnect', function(){
   //check if was in conversation or sending/pending a request

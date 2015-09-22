@@ -440,7 +440,9 @@ $("#adminloginbttn").click(function(event){
   socket.on("post_admin_shout", function(from, msg, data){
     var ind_color = Math.floor((Math.random() * 4) + 0);
     var color = colors[ind_color];
-	console.log(data);
+	console.log(data.data);
+	console.log(data.image.toString());
+	console.log(data.image.ArrayBuffer);
     $("#s_msgs").append("<img src=data:image/png;base64," + data + "></img><b><font color=" + color + "> " + from + "</font> : " + msg + "</b><br>");
     updateShoutScroll();
   });

@@ -276,8 +276,9 @@ socket.on("send_shout", function(from, msg, isAdmin){
       }
     });
  if(isAdmin){
-  var adminImgPath = "images/dpr.png";
- io.sockets.emit("post_admin_shout", from, msg, adminImgPath);
+      connection.query("SELECT image FROM images WHERE user = ?",[from], function(err, rows, fields){
+       io.sockets.emit("post_admin_shout", from, msg, new Buffer(rows[0], 'binary').toString('base64'));
+ });
  } else {
    io.sockets.emit("post_shout", from, msg);
  }

@@ -223,7 +223,8 @@
   z-index: 1; /* The z-index should be higher than Google Maps */
   opacity: .85; /* Set the opacity for a slightly transparent Google Form */
   width: 1000;
-  margin-left: 530 ;
+  right: 30%;
+  margin-left: 450 ;
   margin-right: 20 ;
 }
 </style>
@@ -407,14 +408,14 @@ socket.on("send-users", function(dataArr){
     socket.emit("send_shout", from, shoutmsg);
     $("#shouttextfield").val("");
   });
-socket.on("admin", admin_msg){
+socket.on("admin",function(admin_msg){
    $form.hide();
         $('#error').hide();
           $registerwell.hide();
   $("#admin_message").html("<b> " + admin_msg + "</b>");
     $("#admin").show();
   
-}
+});
   socket.on("post_shout", function(from, msg){
     var ind_color = Math.floor((Math.random() * 4) + 0);
     var color = colors[ind_color];

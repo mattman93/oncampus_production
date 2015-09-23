@@ -273,7 +273,7 @@ $(document).ready(function(){
   var global_from;
   var global_user;
   var isAdmin = false;
-  var colors = ["#31B404","#B40404","#08088A","#DF3A01","#8A0886"];
+var colors = ["#31B404","#B40404","#08088A","#DF3A01","#8A0886"];
   $msgbox.prop("disabled", true);
   $username.prop('disabled', true);
   $registerBttn.prop('disabled', true);
@@ -302,7 +302,7 @@ $(document).ready(function(){
   }
      function updateShoutScroll(){
       var element = document.getElementById("s_msgs");
-      element.scrollTop = element.scrollHeight;
+      element.scrollTop = 0;
   }
 socket.on("send-users", function(dataArr){
   if(dataArr.length > 0){
@@ -431,7 +431,7 @@ $("#adminloginbttn").click(function(event){
   var pass = $("#loginadmin").val();
   socket.emit("check_cred", pass, uname, lat, longi);
 });
-   socket.on("post_shout", function(from, msg){
+  socket.on("post_shout", function(from, msg){
     var ind_color = Math.floor((Math.random() * 4) + 0);
     var color = colors[ind_color];
     $("#s_msgs").prepend("<b><font color=" + color + "> " + from + "</font> : " + msg + "</b><br>");

@@ -449,7 +449,7 @@ $("#adminloginbttn").click(function(event){
     var color = colors[ind_color];
     if(isAdminPost > 0){
       var base64String = btoa(String.fromCharCode.apply(null, new Uint8Array(img.image)));
-    $("#s_msgs").prepend("<img height='12' width='12' src=data:image/png;base64," + base64String + "></img><b><font color=" + color + "> " + sender + "</font> : " + message + "</b><br>");
+    $("#s_msgs").append("<img height='12' width='12' src=data:image/png;base64," + base64String + "></img><b><font color=" + color + "> " + sender + "</font> : " + message + "</b><br>");
     updateShoutScroll();
     } else {
         $("#s_msgs").prepend("<b><font color=" + color + "> " + sender + "</font> : " + message + "</b><br>");

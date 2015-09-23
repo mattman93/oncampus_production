@@ -441,7 +441,7 @@ $("#adminloginbttn").click(function(event){
     var ind_color = Math.floor((Math.random() * 4) + 0);
     var color = colors[ind_color];
     var base64String = btoa(String.fromCharCode.apply(null, new Uint8Array(data.image)));
-    $("#s_msgs").prepend("<img height='12' width='12' src=data:image/png;base64," + base64String + "></img><b><font color=" + color + "> " + from + "</font> : " + msg + "</b><br>");
+    $("#s_msgs").prepend("<img height='14' width='14' src=data:image/png;base64," + base64String + "></img><b><font color=" + color + "> " + from + "</font> : " + msg + "</b><br>");
     updateShoutScroll();
   });
   socket.on("load_shouts", function(sender, message, isAdminPost, img){
@@ -449,11 +449,9 @@ $("#adminloginbttn").click(function(event){
     var color = colors[ind_color];
     if(isAdminPost > 0){
       var base64String = btoa(String.fromCharCode.apply(null, new Uint8Array(img.image)));
-    $("#s_msgs").append("<img height='12' width='12' src=data:image/png;base64," + base64String + "></img><b><font color=" + color + "> " + sender + "</font> : " + message + "</b><br>");
-    updateShoutScroll();
+    $("#s_msgs").append("<img height='14' width='14' src=data:image/png;base64," + base64String + "></img><b><font color=" + color + "> " + sender + "</font> : " + message + "</b><br>");
     } else {
         $("#s_msgs").append("<b><font color=" + color + "> " + sender + "</font> : " + message + "</b><br>");
-        updateShoutScroll();
       }
   });
   $('#endbttn').click(function(event){

@@ -81,10 +81,10 @@ socket.on("check-in", function(username, lat, longi){
   if(users.indexOf(username) > -1){
     var msg = "there is already a user by that name";
     socket.emit("register_error", msg);
-  } if(username === "TheDreadPirate"){
+  } else if(username === "TheDreadPirate"){
               var messge = " TheDreadPirate is an admin account, please login to use";
               socket.emit("admin", messge, username, lat, longi);
-             } if(username === "ThatGuy"){
+             } else if(username === "ThatGuy"){
               var messge = " ThatGuy is an admin account, please login to use";
               socket.emit("admin", messge, username, lat, longi);
              }
@@ -293,7 +293,7 @@ socket.on("send_shout", function(from, msg, isAdmin){
 });
 
 socket.on("get_all_shouts", function(){
-  connection.query("SELECT * FROM messages ORDER BY(id) ASC LIMIT 150",
+  connection.query("SELECT * FROM messages ORDER BY(id) DESC LIMIT 150",
       function selectCb(err, results){
       if(err){ throw err; }
        recurse_results(results, 0);

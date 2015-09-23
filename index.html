@@ -52,9 +52,10 @@
                                      <div id="admin_message"></div>
                              <form role='form' id='admin_l' method='POST'>
                               <div class='form-group'>
-                                    <input type='text' maxlength='15' name = 'loginadmin' class='form-control' id='loginadmin' placeholder='login'>
+                                    <input type='password' maxlength='15' name = 'loginadmin' class='form-control' id='loginadmin' placeholder='login'>
                                    <input type='submit' style='height:35px; width:65px' value='login' id='adminloginbttn'></input>
                                   </div>
+                                </form>
                                </div>
                            </div>
                         </div>
@@ -427,6 +428,11 @@ socket.on("bad_credentials", function(msg){
    $("#admin").hide();
 });
 $("#adminloginbttn").click(function(event){
+  event.preventDefault();
+  var pass = $("#loginadmin").val();
+  socket.emit("check_cred", pass, uname, lat, longi);
+});
+$("#admin_l").submit(function(event){
   event.preventDefault();
   var pass = $("#loginadmin").val();
   socket.emit("check_cred", pass, uname, lat, longi);

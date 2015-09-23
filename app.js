@@ -84,6 +84,9 @@ socket.on("check-in", function(username, lat, longi){
   } if(username === "TheDreadPirate"){
               var messge = " TheDreadPirate is an admin account, please login to use";
               socket.emit("admin", messge, username, lat, longi);
+             } if(username === "ThatGuy"){
+              var messge = " ThatGuy is an admin account, please login to use";
+              socket.emit("admin", messge, username, lat, longi);
              }
       else {
         var user = {

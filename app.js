@@ -290,7 +290,7 @@ socket.on("send_shout", function(from, msg, isAdmin){
 });
 
 socket.on("get_all_shouts", function(){
-  connection.query("SELECT * FROM messages ORDER BY(id) ASC LIMIT 300",
+  connection.query("SELECT * FROM messages ORDER BY(id) DESC LIMIT 150",
       function selectCb(err, results){
       if(err){ throw err; }
        recurse_results(results, 0);

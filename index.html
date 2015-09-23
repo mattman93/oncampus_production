@@ -452,7 +452,7 @@ $("#adminloginbttn").click(function(event){
     $("#s_msgs").append("<img height='12' width='12' src=data:image/png;base64," + base64String + "></img><b><font color=" + color + "> " + sender + "</font> : " + message + "</b><br>");
     updateShoutScroll();
     } else {
-        $("#s_msgs").prepend("<b><font color=" + color + "> " + sender + "</font> : " + message + "</b><br>");
+        $("#s_msgs").append("<b><font color=" + color + "> " + sender + "</font> : " + message + "</b><br>");
         updateShoutScroll();
       }
   });

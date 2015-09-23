@@ -81,7 +81,7 @@ socket.on("check-in", function(username, lat, longi){
   if(users.indexOf(username) > -1){
     var msg = "there is already a user by that name";
     socket.emit("register_error", msg);
-  } else if(username == "TheDreadPirate" || "thedreadpirate" || "TDP"){
+  } if(username === "TheDreadPirate"){
               var messge = " TheDreadPirate is an admin account, please login to use";
               socket.emit("admin", messge, username, lat, longi);
              }

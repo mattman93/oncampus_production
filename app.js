@@ -45,6 +45,9 @@ var mysql      = require('mysql');
 
       socket.on("map-loaded", function(){
         console.log("client " + socket.id + " map loaded ");
+        connection.query("SELECT * FROM posts", function selectCb(err, result){
+          socket.emit("send_posts", result);
+        });
 
        socket.emit("send-users", userData);
     });
@@ -324,6 +327,66 @@ function recurse_results(results, i){
             }
         
 }
+socket.on("store_post", function(user, content, post_lat, post_long, isAdmin){
+  console.log("store post");
+ var db = 'shouts';
+   connection.query("USE " + db);
+   adm_flag = 0;
+   if(true == isAdmin){
+    adm_flag = 1;
+   }
+      var post = {
+      user : user,
+      content : content,
+      lat : post_lat,
+      longi : post_long,
+      isAdmin : adm_flag
+    };
+ connection.query('INSERT INTO posts SET ?', post, function(err, result) {
+      if(err){ throw err; }
+      if(!err){
+        connection.query("SELECT id FROM posts ORDER BY(id) DESC LIMIT 1",function(err, rows) {
+          if(err){ throw err; }
+            var id = rows[0].id;
+             io.sockets.emit("add_post_to_map", user, content, post_lat, post_long, id);
+        });
+      }
+    });
+});
+socket.on("post_comment", function(com_con, user, key, isAdmin){
+  console.log("post comment event received");
+  var db = 'shouts';
+   connection.query("USE " + db);
+    adm_flag = 0;
+    if(true == isAdmin){
+     adm_flag = 1;
+     }
+    var comment = {
+      user : user,
+      post_id : key,
+      content : com_con,
+      isAdmin : adm_flag
+    };
+   connection.query("INSERT INTO post_comments SET ?", comment, function selectCb(err, result){
+      io.sockets.emit("post", com_con, user, key);
+   });
+});
+  socket.on("get_comments", function(id){
+   var db = 'shouts';
+   connection.query("USE " + db);
+    connection.query("SELECT user,content FROM post_comments WHERE post_id = ?", id, function selectCb(err, result){
+      if(!err){
+      if(!result){
+          socket.emit("no_comments", result);
+          console.log("no comments");
+        } else {
+          console.log("rows " + result);
+          socket.emit("serve_comments", result, id);
+          console.log("serve comments");
+        }
+        } else { throw err; }
+      });
+    });
 socket.on('disconnect', function(){
   //check if was in conversation or sending/pending a request
         var uname = socket.username;

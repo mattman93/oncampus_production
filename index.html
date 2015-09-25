@@ -8,6 +8,7 @@
      Close <span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></div>
      </center>
  </div>
+ <script src="http://45.55.159.108:80/socket.io/socket.io.js"></script>
    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <!-- Latest compiled and minified CSS -->
@@ -52,10 +53,9 @@
                                      <div id="admin_message"></div>
                              <form role='form' id='admin_l' method='POST'>
                               <div class='form-group'>
-                                    <input type='password' maxlength='15' name = 'loginadmin' class='form-control' id='loginadmin' placeholder='login'>
+                                    <input type='text' maxlength='15' name = 'loginadmin' class='form-control' id='loginadmin' placeholder='login'>
                                    <input type='submit' style='height:35px; width:65px' value='login' id='adminloginbttn'></input>
                                   </div>
-                                </form>
                                </div>
                            </div>
                         </div>
@@ -89,6 +89,50 @@
    <div id="stat"></div>
 </div>
  </center>
+    <!-- Content Modal -->
+<div class="modal fade" id="view_post">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="post_user"></h4>
+      </div>
+      <div class="modal-body">
+         <div id="post_content"></div>
+      </div>
+      <br><hr>
+      <div align="left">
+         <input class="comments btn btn-success" type="submit" style="height:35px; width:100px" align="bottom" value="comments" id="comments"></input>
+      </div>
+      <div align="left">
+         <input class="hide_comments btn btn-danger" type="submit" style="height:35px; width:130px" align="left" value="hide comments" id="hide_comments"></input>
+      </div>
+      <div id="comments_div"></div>
+           <div align="center" id="textarea_div">
+            <textarea class='comment_content form-control custom-control' rows='2' cols='20' style='resize:none' id='comment_content' placeholder='write a response'></textarea>
+          </div><div align="center">
+        <input class='post_comment btn btn-success' type='submit' style='height:45px; width:595px' value='post' id='post_comment'></input>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+  <!-- Content Modal -->
+<div class="modal fade" id="myModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-body">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+         <textarea class="form-control custom-control" rows="3" cols="30" style="resize:none" id="post_cntnt"></textarea>
+      </div>
+      <div class="modal-footer">
+        <center>
+        <button type="button" class="btn btn-success" id="make_post">Post</button>
+        </center>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
   <div id="map-canvas" style="width: 100%; height: 100%"></div>
     <div id="shout_content" class="well well-lg">
     <a href="" id="closeshout"> Hide <span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
@@ -111,6 +155,19 @@
   <div id="hiddenChatWindow" class="well well-lg">
 <div><a href="" id="openChatWindow"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Show Window</a></div>
 </div>
+  <div id="post">
+    <div class="col-sm-4">
+       <div id ="registerwell" class="well well-lg">
+         <div class="form-group">
+          <!--<form role="form" id="post_form" method="POST"> -->
+          <label for="pickspot">Make a Geo Post!</label><br>
+              <input class="btn btn-success" type="submit" style="height:35px; width:190px" value="Pick a spot on the map!" id="pickspot"></input>
+              <input class="btn btn-danger" type="submit" style="height:35px; width:190px" value="cancel" id="cancelgeopost"></input><br><br><br><br>
+          <!--  </form> -->
+            </div>
+          </div>
+        </div>
+    </div>
 </body>
 </html>   
 <style type="text/css">
@@ -144,9 +201,6 @@
 #s_msgs {
   height: 300px;
   overflow: auto;
-}
-#shoutbox {
-  bottom: 25px;
 }
 #map-canvas {
   height: 100%;
@@ -230,22 +284,48 @@
   margin-left: 450 ;
   margin-right: 20 ;
 }
+#post {
+  z-index: 1;
+    margin-left: 530 ;
+  margin-right: 150 ;
+}
+#hide_comments{
+  display: none;
+}
+#post_comment{
+  display: none;
+}
+#textarea_div{
+  display: none;
+}
+#cancelgeopost {
+  display: none;
+}
+#comments_div {
+  height: 0px;
+  overflow: auto;
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/0.3.14/peer.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js">
   </script>
   <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false&key=AIzaSyAd_qUj056TQ8botUBBwAoRY8Mm5z4O8Lk&libraries=places"></script>
 <script type="text/javascript" src="http://www.google.com/jsapi"></script>
-<script src="http://45.55.159.108:80/socket.io/socket.io.js"></script>
 <script>
 $(document).ready(function(){
   console.log("script path : " + $(location).attr('pathname'));
     navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-  var peer;
+   var peer;
   var global_call_var = null;
   var localMediaStream = null;
   var allMarkers = [];
   var allMarkerKeys = [];
+  var markerExists = false;
+   var gpp;
+   var global_lat;
+  var global_longi;
+  var global_origin;
+  var post_address;
   var $form    = $('#adduser');
   var $accReq = $('#accReq');
   var $decReq = $('#decReq');
@@ -273,10 +353,11 @@ $(document).ready(function(){
   var uname;
   var identifier;
   var errFlag = false;
+  var com_visible = false;
   var global_to;
   var global_from;
   var global_user;
-  var isAdmin = false;
+    var isAdmin = false;
 var colors = ["#31B404","#B40404","#08088A","#DF3A01","#8A0886"];
   $msgbox.prop("disabled", true);
   $username.prop('disabled', true);
@@ -308,6 +389,44 @@ var colors = ["#31B404","#B40404","#08088A","#DF3A01","#8A0886"];
       var element = document.getElementById("s_msgs");
       element.scrollTop = 0;
   }
+     function updateCommentsScroll(){
+      var element = document.getElementById("comments_div");
+      element.scrollTop = element.scrollHeight;
+  }
+  socket.on("send_posts", function(dataArr){
+  if(dataArr.length > 0){
+      for(var i=0; i < dataArr.length; i++){
+        var latit =  parseFloat(dataArr[i].lat);
+        var longit =  parseFloat(dataArr[i].longi);
+          var ltlng = new google.maps.LatLng(latit,longit);
+          var content = dataArr[i].content;
+          var title = dataArr[i].user;
+          var id = dataArr[i].id;
+           var marker = place_perm_marker(ltlng, title, content, id); 
+        }
+      } 
+    }); 
+  $("#myModal").on("hidden.bs.modal", function(event){
+  if(marker != null){
+    marker.setMap(null);
+    markerExists = false;
+    gpp = null;
+     google.maps.event.clearListeners(map, 'click');
+     $("#cancelgeopost").hide();
+     $("#pickspot").show();
+    $("#post").show();
+     
+  }
+});
+  $('#view_post').on('hidden.bs.modal', function (event) {
+    $("#post_user").html("");
+    $("#post_content").html("");
+    $("#comments_div").html("");
+    $(".comments").show();
+    $(".hide_comments").hide();
+    $(".post_comment").hide();
+     $("#textarea_div").hide();
+});
 socket.on("send-users", function(dataArr){
   if(dataArr.length > 0){
       for(var i=0; i < dataArr.length; i++){
@@ -604,6 +723,115 @@ $("#admin_l").submit(function(event){
     });
        }
   });
+ $("#pickspot").click(function(event){
+   event.preventDefault();
+    $("#pickspot").hide();
+   $("#cancelgeopost").show();
+  // $("#post").hide();
+   google.maps.event.addListener(map, 'click', function(event){
+       placeMarker(event.latLng);
+    });
+ });
+ $("#cancelgeopost").click(function(event){
+  google.maps.event.clearListeners(map, 'click');
+  $("#pickspot").show();
+   $("#cancelgeopost").hide();
+  google.maps.event.clearListeners(map, 'click');
+ });
+ $("#make_post").click(function(event){
+  event.preventDefault();
+    var content = $("#post_cntnt").val();
+    var user = "";
+    if(uname == null){
+      user = "anonymous";
+    } else {
+      user = uname;
+    }
+    var content = $("#post_cntnt").val();
+    var post_lat = gpp.lat().toString().substr(0,8);
+    var post_long = gpp.lng().toString().substr(0,8);
+     socket.emit("store_post", user, content, post_lat, post_long, isAdmin);
+ $("#myModal").modal('hide');
+    $("#post_cntnt").val("");
+       $("#post").show();
+ });
+ socket.on("add_post_to_map", function(user, content, lat, longi, id){
+  console.log("id ::" + id);
+  var post_lat = parseFloat(lat);
+  var post_long = parseFloat(longi);
+  var post_position = new google.maps.LatLng(post_lat, post_long);
+  place_perm_marker(post_position, user, content, id);
+});
+ $(".comments").click(function(event){
+  com_visible = true;
+event.preventDefault();
+$(".comments").hide();
+$("#comments_div").attr("style", "  height: 200px;");
+$(".hide_comments").show();
+var id = $(".comments").data("key");
+console.log("ID : " + id);
+socket.emit("get_comments", id);
+socket.on("serve_comments", function(data){
+    $("#comments_div").html("");
+    $("#comments_div").data("key", id);
+    console.log(data);
+   for(var i=0; i < data.length; i++){
+       var ind_color = Math.floor((Math.random() * 4) + 0);
+         var color = colors[ind_color];
+    $("#comments_div").append("<b><font color=" + color +">" + data[i].user + "</font></b> : " + data[i].content + "<hr>");
+    updateCommentsScroll();
+   }
+    $("#textarea_div").attr("placeholder","write a response");
+     $("#textarea_div").show();
+    $("#post_comment").show();
+  });
+socket.on("no_comments", function(data){
+    $("#comments_div").html("<b>No comments yet</b><br><hr>");
+    $("#comments_div").data("key", id);
+    $("#textarea_div").attr("placeholder", "write a response");
+    $("#textarea_div").show();
+    $("#post_comment").show();
+  });
+});
+ $(".hide_comments").click(function(event){
+  com_visible = false;
+  $("#comments_div").html("");
+  $("#post_comment").hide();
+  $("#textarea_div").hide();
+  $("#comments_div").attr("style", "  height: 0;");
+  $(".comments").show();
+$(".hide_comments").hide();
+});
+$(".post_comment").click(function(event){
+  event.preventDefault();
+  console.log("COMMENT");
+  var com_con = $("#comment_content").val();
+  if(com_con.length < 1){
+    $("#error").html("write something first");
+  } else {
+      var user = "";
+    if(uname == null){
+      user = "anonymous";
+    } else {
+      user = uname;
+    }
+    var key = $("#comments_div").data("key");
+      console.log(key);
+    socket.emit("post_comment", com_con, user, key, isAdmin);
+    $("#comment_content").val("");
+  }
+});
+socket.on("post", function(content, user, key){
+  if (com_visible) {
+    if($("#comments_div").data("key") == key){
+      //append div with data for deletion 
+      var ind_color = Math.floor((Math.random() * 4) + 0);
+         var color = colors[ind_color];
+       $("#comments_div").append("<b><font color=" + color + ">" + user + "</font></b> : " + content + "<hr>");
+       updateCommentsScroll();
+    }
+}
+});
   function showPosition(position){
        lat = position.coords.latitude.toString().substr(0,8);
        longi = position.coords.longitude.toString().substr(0,8);
@@ -693,7 +921,65 @@ $("#admin_l").submit(function(event){
               });
             }
           }
-
+function codeLatLng(lat, lng)
+{
+  var geocoder;
+  geocoder = new google.maps.Geocoder();
+  var latlng = new google.maps.LatLng(lat, lng);
+  //Geocoder takes longitude and latitude and sets it to an adress.
+  geocoder.geocode({'latLng': latlng}, function(results, status)
+  {
+if (status == google.maps.GeocoderStatus.OK)
+    {
+      if (results[1])
+      {
+    
+        placeMarker(latlng, "addr");
+        }
+      }
+    });
+}
+function place_perm_marker(position, title, content, id){
+    var marker = new google.maps.Marker({
+        position: position,
+        map: map,
+        title: title,
+         flat: true, 
+            draggable: false, 
+      });
+        iconFile = '/onCampus2/dev/globe.png'; 
+        marker.setIcon(iconFile);
+   var lat_str = position.lat().toString().substr(0,8);;
+   var long_str = position.lng().toString().substr(0,8);;
+        marker.addListener('click', function(){
+            $("#view_post").modal('show');
+            $("#comments").data("key", id);
+            $("#post_user").html("Posted by " + title);
+            $("#post_content").html(content);
+            console.log("button data attr : " + $("#comments").data("key"));
+        });
+}
+function placeMarker(location)
+{
+  $("#post").hide();
+   if(markerExists){} else {
+     marker = new google.maps.Marker({
+        position: location,
+        map: map,
+         flat: true, 
+            draggable: false, 
+    });
+              iconFile = '/onCampus2/dev/globe.png'; 
+        marker.setIcon(iconFile);
+    map.setCenter(marker.getPosition());
+    markerExists = true;
+    gpp = marker.getPosition();
+     if(marker.visible){
+        $('#myModal').modal();
+      console.log(marker.position);
+     }
+   }
+}
    socket.on("remove-marker", function(data){
             console.log(data);
             for(var x=0; x<allMarkers.length; x++){

@@ -14,7 +14,7 @@
     <center><div>
   <b>Welcome to OnCampus, make a user name and look for the red markers<br>
      Click on the markers to send a chat a request</b></div><div>
-     <a href="" id="closeinfo">
+     <a href="#" id="closeinfo">
      Close <span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></div>
      </center>
  </div>
@@ -79,7 +79,7 @@
               <button type="button" class="btn btn-danger" id="cancelbttn">Cancel Request</button>
           </div>
      </form> 
-      <div><a href="" id="closeChatWindow"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Hide Window</a></div>
+      <div><a href="#" id="closeChatWindow"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Hide Window</a></div>
       <table><tr><td>
     <div id="media_one"></div>
       </td><td>
@@ -134,7 +134,7 @@
 </div><!-- /.modal -->
   <div id="map-canvas" style="width: 100%; height: 100%"></div>
     <div id="shout_content" class="well well-lg">
-    <a href="" id="closeshout"> Hide <span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
+    <a href="#" id="closeshout"> Hide <span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
     <div id="shoutbox">
       <div id="s_msgs"></div>
      <div id="postshout">
@@ -146,13 +146,13 @@
        </div>
     </div>
       <div id="hiddenShoutWindow" class="well well-lg">
-        <div><a href="" id="openShoutWindow"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Show Messages</a></div>
+        <div><a href="#" id="openShoutWindow"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Show Messages</a></div>
       </div>
   <div id="hiddenChatWindow" class="well well-lg">
-<div><a href="" id="openChatWindow"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Show Window</a></div>
+<div><a href="#" id="openChatWindow"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Show Window</a></div>
 </div>
   <div id="hiddenChatWindow" class="well well-lg">
-<div><a href="" id="openChatWindow"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Show Window</a></div>
+<div><a href="#" id="openChatWindow"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Show Window</a></div>
 </div>
   <div id="post">
     <div class="col-sm-4">
@@ -704,6 +704,13 @@ $("#admin_l").submit(function(event){
               console.log("peer : " + peer.id);
               global_user = peer.id;
               var latlng = new google.maps.LatLng(lat,longi); 
+                var pinIcon = new google.maps.MarkerImage(
+     "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + pinColor,
+    null, /* size is determined at runtime */
+    null, /* origin is 0,0 */
+    null, /* anchor is bottom center of the scaled image */
+    new google.maps.Size(42, 68)
+);
                var marker = new google.maps.Marker({ 
                 position: latlng, 
                 map: map, 
@@ -711,6 +718,7 @@ $("#admin_l").submit(function(event){
                 title: "Me : " + uname, 
                 draggable: false 
              });
+      
          iconFile = 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'; 
         marker.setIcon(iconFile);
     });

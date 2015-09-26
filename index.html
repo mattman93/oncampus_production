@@ -898,13 +898,13 @@ function place_perm_marker(position, title, content, id){
       });
         iconFile = 'http://www.oncampus.ws:8080/globe.png'; 
         marker.setIcon(iconFile);
-   var lat_str = position.lat().toString().substr(0,8);;
-   var long_str = position.lng().toString().substr(0,8);;
+   var lat_str = position.lat().toString().substr(0,8);
+   var long_str = position.lng().toString().substr(0,8);
         marker.addListener('click', function(){
             $("#view_post").modal('show');
             $("#comments").data("key", id);
             $("#post_user").html("Posted by " + title);
-            $("#post_content").html(content);
+            $("#post_content").html("<b><h3>" + content + "</b></h3>");
 socket.emit("get_comments", id);
 socket.on("serve_comments", function(data){
     $("#comments_div").html("");

@@ -303,7 +303,7 @@
   display: none;
 }
 #comments_div {
-  height: 0px;
+  height: 200px;
   overflow: auto;
 }
 </style>
@@ -762,46 +762,6 @@ $("#admin_l").submit(function(event){
   var post_position = new google.maps.LatLng(post_lat, post_long);
   place_perm_marker(post_position, user, content, id);
 });
- $(".comments").click(function(event){
-  com_visible = true;
-event.preventDefault();
-$(".comments").hide();
-$("#comments_div").attr("style", "  height: 200px;");
-$(".hide_comments").show();
-var id = $(".comments").data("key");
-console.log("ID : " + id);
-socket.emit("get_comments", id);
-socket.on("serve_comments", function(data){
-    $("#comments_div").html("");
-    $("#comments_div").data("key", id);
-    console.log(data);
-   for(var i=0; i < data.length; i++){
-       var ind_color = Math.floor((Math.random() * 4) + 0);
-         var color = colors[ind_color];
-    $("#comments_div").append("<b><font color=" + color +">" + data[i].user + "</font></b> : " + data[i].content + "<hr>");
-    updateCommentsScroll();
-   }
-    $("#textarea_div").attr("placeholder","write a response");
-     $("#textarea_div").show();
-    $("#post_comment").show();
-  });
-socket.on("no_comments", function(data){
-    $("#comments_div").html("<b>No comments yet</b><br><hr>");
-    $("#comments_div").data("key", id);
-    $("#textarea_div").attr("placeholder", "write a response");
-    $("#textarea_div").show();
-    $("#post_comment").show();
-  });
-});
- $(".hide_comments").click(function(event){
-  com_visible = false;
-  $("#comments_div").html("");
-  $("#post_comment").hide();
-  $("#textarea_div").hide();
-  $("#comments_div").attr("style", "  height: 0;");
-  $(".comments").show();
-$(".hide_comments").hide();
-});
 $(".post_comment").click(function(event){
   event.preventDefault();
   console.log("COMMENT");
@@ -822,7 +782,6 @@ $(".post_comment").click(function(event){
   }
 });
 socket.on("post", function(content, user, key){
-  if (com_visible) {
     if($("#comments_div").data("key") == key){
       //append div with data for deletion 
       var ind_color = Math.floor((Math.random() * 4) + 0);
@@ -830,7 +789,6 @@ socket.on("post", function(content, user, key){
        $("#comments_div").append("<b><font color=" + color + ">" + user + "</font></b> : " + content + "<hr>");
        updateCommentsScroll();
     }
-}
 });
   function showPosition(position){
        lat = position.coords.latitude.toString().substr(0,8);
@@ -956,6 +914,28 @@ function place_perm_marker(position, title, content, id){
             $("#comments").data("key", id);
             $("#post_user").html("Posted by " + title);
             $("#post_content").html(content);
+socket.emit("get_comments", id);
+socket.on("serve_comments", function(data){
+    $("#comments_div").html("");
+    $("#comments_div").data("key", id);
+    console.log(data);
+   for(var i=0; i < data.length; i++){
+       var ind_color = Math.floor((Math.random() * 4) + 0);
+         var color = colors[ind_color];
+    $("#comments_div").append("<b><font color=" + color +">" + data[i].user + "</font></b> : " + data[i].content + "<hr>");
+    updateCommentsScroll();
+   }
+    $("#textarea_div").attr("placeholder","write a response");
+     $("#textarea_div").show();
+    $("#post_comment").show();
+  });
+socket.on("no_comments", function(data){
+    $("#comments_div").html("<b>No comments yet</b><br><hr>");
+    $("#comments_div").data("key", id);
+    $("#textarea_div").attr("placeholder", "write a response");
+    $("#textarea_div").show();
+    $("#post_comment").show();
+  });
             console.log("button data attr : " + $("#comments").data("key"));
         });
 }

@@ -300,6 +300,7 @@
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/0.3.14/peer.js"></script>
   <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false&key=AIzaSyAd_qUj056TQ8botUBBwAoRY8Mm5z4O8Lk&libraries=places"></script>
+  <script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/maplabel/src/map‌​label.js"></script>
 <script type="text/javascript" src="http://www.google.com/jsapi"></script>
 <script>
 $(document).ready(function(){
@@ -896,12 +897,13 @@ function place_perm_marker(position, title, content, id){
          flat: true, 
             draggable: false, 
       });
-     infoWindow = new google.maps.InfoWindow();
-    infoWindow.setOptions({
-        content: "<div>num of comments</div>",
-        position: position,
-    });
-    infoWindow.open(map); 
+     var mapLabel = new MapLabel({
+           text: '1',
+           position: position,
+           map: map,
+           fontSize: 7,
+           align: 'center'
+         });
         iconFile = 'http://www.oncampus.ws:8080/globe.png'; 
         marker.setIcon(iconFile);
    var lat_str = position.lat().toString().substr(0,8);

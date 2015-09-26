@@ -896,6 +896,12 @@ function place_perm_marker(position, title, content, id){
          flat: true, 
             draggable: false, 
       });
+     infoWindow = new google.maps.InfoWindow();
+    infoWindow.setOptions({
+        content: "<div>num of comments</div>",
+        position: position,
+    });
+    infoWindow.open(map); 
         iconFile = 'http://www.oncampus.ws:8080/globe.png'; 
         marker.setIcon(iconFile);
    var lat_str = position.lat().toString().substr(0,8);

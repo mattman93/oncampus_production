@@ -704,13 +704,6 @@ $("#admin_l").submit(function(event){
               console.log("peer : " + peer.id);
               global_user = peer.id;
               var latlng = new google.maps.LatLng(lat,longi); 
-                var pinIcon = new google.maps.MarkerImage(
-     "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + pinColor,
-    null, /* size is determined at runtime */
-    null, /* origin is 0,0 */
-    null, /* anchor is bottom center of the scaled image */
-    new google.maps.Size(42, 68)
-);
                var marker = new google.maps.Marker({ 
                 position: latlng, 
                 map: map, 
@@ -952,7 +945,7 @@ function place_perm_marker(position, title, content, id){
          flat: true, 
             draggable: false, 
       });
-        iconFile = '/onCampus2/dev/globe.png'; 
+        iconFile = 'oncampus/images/globe.png'; 
         marker.setIcon(iconFile);
    var lat_str = position.lat().toString().substr(0,8);;
    var long_str = position.lng().toString().substr(0,8);;
@@ -974,7 +967,7 @@ function placeMarker(location)
          flat: true, 
             draggable: false, 
     });
-              iconFile = '/onCampus2/dev/globe.png'; 
+              iconFile = 'oncampus/images/globe.png'; 
         marker.setIcon(iconFile);
     map.setCenter(marker.getPosition());
     markerExists = true;

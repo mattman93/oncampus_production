@@ -897,13 +897,6 @@ function place_perm_marker(position, title, content, id){
          flat: true, 
             draggable: false, 
       });
-     var mapLabel = new MapLabel({
-           text: '1',
-           position: position,
-           map: map,
-           fontSize: 7,
-           align: 'center'
-         });
         iconFile = 'http://www.oncampus.ws:8080/globe.png'; 
         marker.setIcon(iconFile);
    var lat_str = position.lat().toString().substr(0,8);
